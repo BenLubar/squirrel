@@ -330,7 +330,11 @@ bool SQVM::ToString(const SQObjectPtr &o,SQObjectPtr &res)
             }
         }
     default:
+#ifdef NO_POINTER_CMP
+        scsprintf(_sp(sq_rsl((sizeof(void*)*2))),sq_rsl((sizeof(void*)*2)),_SC("(%s)"),GetTypeName(o));
+#else
         scsprintf(_sp(sq_rsl((sizeof(void*)*2)+NUMBER_MAX_CHAR)),sq_rsl((sizeof(void*)*2)+NUMBER_MAX_CHAR),_SC("(%s : 0x%p)"),GetTypeName(o),(void*)_rawval(o));
+#endif
     }
     res = SQString::Create(_ss(this),_spval);
     return true;
@@ -732,7 +736,7 @@ bool SQVM::Execute(SQObjectPtr &closure, SQInteger nargs, SQInteger stackbase,SQ
             ci->_root = SQTrue;
                       }
             break;
-        case ET_RESUME_GENERATOR: 
+        case ET_RESUME_GENERATOR:
             if(!_generator(closure)->Resume(this, outres)) {
                 return false;
             }
