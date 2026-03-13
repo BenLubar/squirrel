@@ -1526,6 +1526,7 @@ bool SQVM::NewSlot(const SQObjectPtr &self,const SQObjectPtr &key,const SQObject
         if(rawcall) _table(self)->NewSlot(key,val); //cannot fail
 
         break;}
+    case OT_USERDATA:
     case OT_INSTANCE: {
         SQObjectPtr res;
         SQObjectPtr closure;
@@ -1536,7 +1537,7 @@ bool SQVM::NewSlot(const SQObjectPtr &self,const SQObjectPtr &key,const SQObject
             }
             break;
         }
-        Raise_Error(_SC("class instances do not support the new slot operator"));
+        Raise_Error(_SC("%s does not support the new slot operator"),GetTypeName(self));
         return false;
         break;}
     case OT_CLASS:
