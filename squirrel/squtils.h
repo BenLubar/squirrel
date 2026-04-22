@@ -31,6 +31,7 @@ public:
     }
     void copy(const sqvector<T>& v)
     {
+        assert(this != &v);
         if(_size) {
             resize(0); //destroys all previous stuff
         }
@@ -70,7 +71,7 @@ public:
         }
     }
     void shrinktofit() { if(_size > 4) { _realloc(_size); } }
-    T& top() const { return _vals[_size - 1]; }
+    T& top() const { assert(_size > 0); return _vals[_size - 1]; }
     inline SQUnsignedInteger size() const { return _size; }
     bool empty() const { return (_size <= 0); }
     inline T &push_back(const T& val = T())
@@ -81,10 +82,12 @@ public:
     }
     inline void pop_back()
     {
+        assert(_size > 0);
         _size--; _vals[_size].~T();
     }
     void insert(SQUnsignedInteger idx, const T& val)
     {
+        assert(idx <= _size);
         resize(_size + 1);
         for(SQUnsignedInteger i = _size - 1; i > idx; i--) {
             _vals[i] = _vals[i - 1];
@@ -93,6 +96,7 @@ public:
     }
     void remove(SQUnsignedInteger idx)
     {
+        assert(idx < _size);
         _vals[idx].~T();
         if(idx < (_size - 1)) {
             memmove((void*)&_vals[idx], &_vals[idx+1], sizeof(T) * (_size - idx - 1));
@@ -100,14 +104,15 @@ public:
         _size--;
     }
     SQUnsignedInteger capacity() { return _allocated; }
-    inline T &back() const { return _vals[_size - 1]; }
-    inline T& operator[](SQUnsignedInteger pos) const{ return _vals[pos]; }
+    inline T &back() const { assert(_size > 0); return _vals[_size - 1]; }
+    inline T& operator[](SQUnsignedInteger pos) const{ assert(pos < _size); return _vals[pos]; }
     T* _vals;
 private:
     void _realloc(SQUnsignedInteger newsize)
     {
         newsize = (newsize > 0)?newsize:4;
         _vals = (T*)SQ_REALLOC(_vals, _allocated * sizeof(T), newsize * sizeof(T));
+        assert(_vals);
         _allocated = newsize;
     }
     SQUnsignedInteger _size;
