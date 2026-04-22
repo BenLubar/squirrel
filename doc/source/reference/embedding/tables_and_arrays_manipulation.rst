@@ -52,6 +52,11 @@ To get or set a value from a table without employing delegation::
     SQRESULT sq_rawget(HSQUIRRELVM v,SQInteger idx);
     SQRESULT sq_rawset(HSQUIRRELVM v,SQInteger idx);
 
+To check whether a slot exists in an array or table::
+
+    SQBool sq_in(HSQUIRRELVM v,SQInteger idx);
+    SQBool sq_rawin(HSQUIRRELVM v,SQInteger idx);
+
 To iterate a table or an array::
 
     SQRESULT sq_next(HSQUIRRELVM v,SQInteger idx);

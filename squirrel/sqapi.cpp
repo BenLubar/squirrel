@@ -1095,6 +1095,33 @@ SQRESULT sq_rawget(HSQUIRRELVM v,SQInteger idx)
     return sq_throwerror(v,_SC("the index doesn't exist"));
 }
 
+SQBool sq_in(HSQUIRRELVM v,SQInteger idx)
+{
+    SQObjectPtr &self=stack_get(v,idx);
+    SQObjectPtr &obj = v->GetUp(-1);
+    SQObjectPtr value;
+    return v->Get(self,obj,value,GET_FLAG_DO_NOT_RAISE_ERROR,DONT_FALL_BACK) ? SQTrue : SQFalse;
+}
+
+SQBool sq_rawin(HSQUIRRELVM v,SQInteger idx)
+{
+    SQObjectPtr &self=stack_get(v,idx);
+    SQObjectPtr &obj = v->GetUp(-1);
+    SQObjectPtr value;
+    switch(sq_type(self)) {
+    case OT_TABLE:
+        return _table(self)->Get(obj,value) ? SQTrue : SQFalse;
+    case OT_CLASS:
+        return _class(self)->Get(obj,value) ? SQTrue : SQFalse;
+    case OT_INSTANCE:
+        return _instance(self)->Get(obj,value) ? SQTrue : SQFalse;
+    case OT_ARRAY:
+        return sq_isnumeric(obj) && _array(self)->Get(tointeger(obj),value) ? SQTrue : SQFalse;
+    default:
+        return SQFalse;
+    }
+}
+
 SQRESULT sq_getstackobj(HSQUIRRELVM v,SQInteger idx,HSQOBJECT *po)
 {
     *po=stack_get(v,idx);
