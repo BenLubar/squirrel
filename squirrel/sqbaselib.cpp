@@ -941,7 +941,7 @@ static SQInteger string_find(HSQUIRRELVM v) {
 	const SQChar *str;
 	const SQChar *substr;
 	const SQChar *ret;
-	if (((top = sq_gettop(v)) > 1) && SQ_SUCCEEDED(sq_getstring(v, 1, &str)) && SQ_SUCCEEDED(sq_getstring(v, 2, &substr))) {
+	if (top = sq_gettop(v); top > 1 && SQ_SUCCEEDED(sq_getstring(v, 1, &str)) && SQ_SUCCEEDED(sq_getstring(v, 2, &substr))) {
 		if (top > 2) {
 			sq_getinteger(v, 3, &start_idx);
 		}

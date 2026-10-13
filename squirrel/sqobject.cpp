@@ -232,8 +232,8 @@ bool SQGenerator::Resume(SQVM *v, SQObjectPtr &dest) {
 }
 
 void SQArray::Extend(const SQArray *a) {
-	SQInteger xlen;
-	if ((xlen = a->Size()) != 0) {
+	SQInteger xlen = a->Size();
+	if (xlen != 0) {
 		for (SQInteger i = 0; i < xlen; i++) {
 			Append(a->_values[i]);
 		}

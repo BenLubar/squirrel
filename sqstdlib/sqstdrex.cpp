@@ -491,7 +491,8 @@ static const SQChar *sqstd_rex_matchnode(SQRex *exp, SQRexNode *node, const SQCh
 
 			while ((nmaches == 0xFFFF || nmaches < p1)) {
 				const SQChar *stop;
-				if ((s = sqstd_rex_matchnode(exp, &exp->_nodes[node->left], s, greedystop)) == nullptr) {
+				s = sqstd_rex_matchnode(exp, &exp->_nodes[node->left], s, greedystop);
+				if (s == nullptr) {
 					break;
 				}
 				nmaches++;
@@ -574,7 +575,8 @@ static const SQChar *sqstd_rex_matchnode(SQRex *exp, SQRexNode *node, const SQCh
 				} else {
 					subnext = next;
 				}
-				if ((cur = sqstd_rex_matchnode(exp, n, cur, subnext)) == nullptr) {
+				cur = sqstd_rex_matchnode(exp, n, cur, subnext);
+				if (cur == nullptr) {
 					if (capture != -1) {
 						exp->_matches[capture].begin = nullptr;
 						exp->_matches[capture].len = 0;

@@ -861,14 +861,14 @@ public:
 
 				SQInteger pos = -1;
 				Lex();
-				if ((pos = _fs->GetLocalVariable(id)) != -1) {
+				if (pos = _fs->GetLocalVariable(id); pos != -1) {
 					/* Handle a local variable (includes 'this') */
 					_fs->PushTarget(pos);
 					_es.etype = LOCAL;
 					_es.epos = pos;
 				}
 
-				else if ((pos = _fs->GetOuterVariable(id)) != -1) {
+				else if (pos = _fs->GetOuterVariable(id); pos != -1) {
 					/* Handle a free var */
 					if (NeedGet()) {
 						_es.epos = _fs->PushTarget();

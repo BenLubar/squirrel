@@ -4,6 +4,7 @@
 #include <sqstdio.h>
 #include <squirrel.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <new>
 
@@ -73,7 +74,8 @@ struct SQFile : public SQStream {
 	virtual ~SQFile() { Close(); }
 	bool Open(const SQChar *filename, const SQChar *mode) {
 		Close();
-		if ((_handle = sqstd_fopen(filename, mode)) != nullptr) {
+		_handle = sqstd_fopen(filename, mode);
+		if (_handle != nullptr) {
 			_owns = true;
 			return true;
 		}
@@ -221,7 +223,8 @@ SQInteger _read_byte(IOBuffer *iobuffer) {
 		iobuffer->ptr++;
 		return ret;
 	} else {
-		if ((iobuffer->size = sqstd_fread(iobuffer->buffer, 1, IO_BUFFER_SIZE, iobuffer->file)) > 0) {
+		iobuffer->size = sqstd_fread(iobuffer->buffer, 1, IO_BUFFER_SIZE, iobuffer->file);
+		if (iobuffer->size > 0) {
 			SQInteger ret = iobuffer->buffer[0];
 			iobuffer->ptr = 1;
 			return ret;
@@ -240,7 +243,8 @@ SQInteger _read_two_bytes(IOBuffer *iobuffer) {
 		iobuffer->ptr += 2;
 		return ret;
 	} else {
-		if ((iobuffer->size = sqstd_fread(iobuffer->buffer, 1, IO_BUFFER_SIZE, iobuffer->file)) > 0) {
+		iobuffer->size = sqstd_fread(iobuffer->buffer, 1, IO_BUFFER_SIZE, iobuffer->file);
+		if (iobuffer->size > 0) {
 			if (iobuffer->size < 2) {
 				return 0;
 			}
@@ -298,18 +302,15 @@ static SQInteger _io_file_lexfeed_UTF8(SQUserPointer iobuf) {
 #endif
 
 static SQInteger _io_file_lexfeed_UCS2_LE(SQUserPointer iobuf) {
-	SQInteger ret;
 	IOBuffer *iobuffer = static_cast<IOBuffer *>(iobuf);
-	if ((ret = _read_two_bytes(iobuffer)) > 0) {
-		return ret;
-	}
-	return 0;
+	SQInteger ret = _read_two_bytes(iobuffer);
+	return std::max<SQInteger>(ret, 0);
 }
 
 static SQInteger _io_file_lexfeed_UCS2_BE(SQUserPointer iobuf) {
-	SQInteger c;
 	IOBuffer *iobuffer = static_cast<IOBuffer *>(iobuf);
-	if ((c = _read_two_bytes(iobuffer)) > 0) {
+	SQInteger c = _read_two_bytes(iobuffer);
+	if (c > 0) {
 		c = ((c >> 8) & 0x00FF) | ((c << 8) & 0xFF00);
 		return c;
 	}
@@ -317,8 +318,8 @@ static SQInteger _io_file_lexfeed_UCS2_BE(SQUserPointer iobuf) {
 }
 
 SQInteger file_read(SQUserPointer file, SQUserPointer buf, SQInteger size) {
-	SQInteger ret;
-	if ((ret = sqstd_fread(buf, 1, size, static_cast<SQFILE>(file))) != 0) {
+	SQInteger ret = sqstd_fread(buf, 1, size, static_cast<SQFILE>(file));
+	if (ret != 0) {
 		return ret;
 	}
 	return -1;

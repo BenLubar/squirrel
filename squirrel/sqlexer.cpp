@@ -253,20 +253,20 @@ SQInteger SQLexer::Lex() {
 					RETURN_TOKEN(TK_NE);
 				}
 			case _SC('@'): {
-				SQInteger stype;
 				NEXT();
 				if (CUR_CHAR != _SC('"')) {
 					RETURN_TOKEN('@');
 				}
-				if ((stype = ReadString('"', true)) != -1) {
+				SQInteger stype = ReadString('"', true);
+				if (stype != -1) {
 					RETURN_TOKEN(stype);
 				}
 				Error(_SC("error parsing the string"));
 			}
 			case _SC('"'):
 			case _SC('\''): {
-				SQInteger stype;
-				if ((stype = ReadString(CUR_CHAR, false)) != -1) {
+				SQInteger stype = ReadString(CUR_CHAR, false);
+				if (stype != -1) {
 					RETURN_TOKEN(stype);
 				}
 				Error(_SC("error parsing the string"));

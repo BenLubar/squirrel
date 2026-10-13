@@ -62,9 +62,11 @@ bool SQClass::NewSlot(SQSharedState *ss, const SQObjectPtr &key, const SQObjectP
 		return false;
 	}
 	if (belongs_to_static_table) {
-		SQInteger mmidx;
-		if ((sq_type(val) == OT_CLOSURE || sq_type(val) == OT_NATIVECLOSURE) &&
-				(mmidx = ss->GetMetaMethodIdxByName(key)) != -1) {
+		SQInteger mmidx = -1;
+		if (sq_type(val) == OT_CLOSURE || sq_type(val) == OT_NATIVECLOSURE) {
+			mmidx = ss->GetMetaMethodIdxByName(key);
+		}
+		if (mmidx != -1) {
 			_metamethods[mmidx] = val;
 		} else {
 			SQObjectPtr theval = val;

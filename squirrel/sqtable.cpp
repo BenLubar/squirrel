@@ -192,9 +192,9 @@ bool SQTable::NewSlot(const SQObjectPtr &key, const SQObjectPtr &val) {
 	if (sq_type(mp->key) != OT_NULL) {
 		n = _firstfree; /* get a free place */
 		SQHash mph = HashObj(mp->key) & (_numofnodes - 1);
-		_HashNode *othern; /* main position of colliding node */
+		_HashNode *othern = &_nodes[mph]; /* main position of colliding node */
 
-		if (mp > n && (othern = &_nodes[mph]) != mp) {
+		if (mp > n && othern != mp) {
 			/* yes; move colliding node into free position */
 			while (othern->next != mp) {
 				assert(othern->next != NULL);

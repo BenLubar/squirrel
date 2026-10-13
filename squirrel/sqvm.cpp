@@ -535,9 +535,8 @@ bool SQVM::StartCall(SQClosure *closure, SQInteger target, SQInteger args, SQInt
 		//dumpstack(stackbase);
 	} else if (paramssize != nargs) {
 		SQInteger ndef = func->_ndefaultparams;
-		SQInteger diff;
-		if ((ndef != 0) && nargs < paramssize && (diff = paramssize - nargs) <= ndef) {
-			for (SQInteger n = ndef - diff; n < ndef; n++) {
+		if ((ndef != 0) && nargs < paramssize && (paramssize - nargs) <= ndef) {
+			for (SQInteger n = ndef - (paramssize - nargs); n < ndef; n++) {
 				_stack._vals[stackbase + (nargs++)] = closure->_defaultparams[n];
 			}
 		} else {
@@ -666,25 +665,29 @@ bool SQVM::FOREACH_OP(SQObjectPtr &o1, SQObjectPtr &o2, SQObjectPtr &o3, SQObjec
 	SQInteger nrefidx;
 	switch (sq_type(o1)) {
 		case OT_TABLE:
-			if ((nrefidx = _table(o1)->Next(false, o4, o2, o3)) == -1) {
+			nrefidx = _table(o1)->Next(false, o4, o2, o3);
+			if (nrefidx == -1) {
 				_FINISH(exitpos);
 			}
 			o4 = nrefidx;
 			_FINISH(1);
 		case OT_ARRAY:
-			if ((nrefidx = _array(o1)->Next(o4, o2, o3)) == -1) {
+			nrefidx = _array(o1)->Next(o4, o2, o3);
+			if (nrefidx == -1) {
 				_FINISH(exitpos);
 			}
 			o4 = nrefidx;
 			_FINISH(1);
 		case OT_STRING:
-			if ((nrefidx = _string(o1)->Next(o4, o2, o3)) == -1) {
+			nrefidx = _string(o1)->Next(o4, o2, o3);
+			if (nrefidx == -1) {
 				_FINISH(exitpos);
 			}
 			o4 = nrefidx;
 			_FINISH(1);
 		case OT_CLASS:
-			if ((nrefidx = _class(o1)->Next(o4, o2, o3)) == -1) {
+			nrefidx = _class(o1)->Next(o4, o2, o3);
+			if (nrefidx == -1) {
 				_FINISH(exitpos);
 			}
 			o4 = nrefidx;
@@ -750,9 +753,9 @@ bool SQVM::FOREACH_OP(SQObjectPtr &o1, SQObjectPtr &o2, SQObjectPtr &o3, SQObjec
 	}
 
 bool SQVM::CLOSURE_OP(SQObjectPtr &target, SQFunctionProto *func, SQInteger boundtarget) {
-	SQInteger nouters;
+	SQInteger nouters = func->_noutervalues;
 	SQClosure *closure = SQClosure::Create(_ss(this), func, _table(_roottable)->GetWeakRef(OT_TABLE));
-	if ((nouters = func->_noutervalues) != 0) {
+	if (nouters != 0) {
 		for (SQInteger i = 0; i < nouters; i++) {
 			SQOuterVar &v = func->_outervalues[i];
 			switch (v._type) {
@@ -765,8 +768,8 @@ bool SQVM::CLOSURE_OP(SQObjectPtr &target, SQFunctionProto *func, SQInteger boun
 			}
 		}
 	}
-	SQInteger ndefparams;
-	if ((ndefparams = func->_ndefaultparams) != 0) {
+	SQInteger ndefparams = func->_ndefaultparams;
+	if (ndefparams != 0) {
 		for (SQInteger i = 0; i < ndefparams; i++) {
 			SQInteger spos = func->_defaultparams[i];
 			closure->_defaultparams[i] = _stack._vals[_stackbase + spos];
@@ -1473,9 +1476,9 @@ bool SQVM::CallNative(SQNativeClosure *nclosure, SQInteger nargs, SQInteger newb
 		return false;
 	}
 
-	SQInteger tcs;
 	SQIntVec &tc = nclosure->_typecheck;
-	if ((tcs = tc.size()) != 0) {
+	SQInteger tcs = tc.size();
+	if (tcs != 0) {
 		for (SQInteger i = 0; i < nargs && i < tcs; i++) {
 			if ((tc._vals[i] != -1) && ((sq_type(_stack._vals[newbase + i]) & tc._vals[i]) == 0)) {
 				Raise_ParamTypeError(i, tc._vals[i], sq_type(_stack._vals[newbase + i]));
