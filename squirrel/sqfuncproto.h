@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQFUNCTION_H_
-#define _SQFUNCTION_H_
+#pragma once
 
 #include "sqopcodes.h"
 
@@ -140,5 +139,3 @@ public:
 	SQInteger _ninstructions;
 	SQInstruction _instructions[1];
 };
-
-#endif //_SQFUNCTION_H_

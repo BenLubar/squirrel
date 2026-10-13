@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQSTDIO_H_
-#define _SQSTDIO_H_
+#pragma once
 
 #ifdef __cplusplus
 
@@ -49,5 +48,3 @@ SQUIRREL_API SQRESULT sqstd_register_iolib(HSQUIRRELVM v);
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
-
-#endif /*_SQSTDIO_H_*/

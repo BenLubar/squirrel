@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQFUNCSTATE_H_
-#define _SQFUNCSTATE_H_
+#pragma once
 ///////////////////////////////////
 #include "squtils.h"
 
@@ -92,5 +91,3 @@ private:
 	void *_errtarget;
 	SQSharedState *_ss;
 };
-
-#endif //_SQFUNCSTATE_H_

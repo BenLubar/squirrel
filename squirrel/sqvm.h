@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQVM_H_
-#define _SQVM_H_
+#pragma once
 
 #include "sqobject.h"
 #include "sqopcodes.h"
@@ -220,4 +219,3 @@ inline SQObjectPtr &stack_get(HSQUIRRELVM v, SQInteger idx) {
 		v->ci->_closure.Null(); \
 		v->ci = css ? &v->_callsstack[css - 1] : NULL; \
 	}
-#endif //_SQVM_H_

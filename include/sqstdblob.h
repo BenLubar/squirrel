@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQSTDBLOB_H_
-#define _SQSTDBLOB_H_
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,5 +14,3 @@ SQUIRREL_API SQRESULT sqstd_register_bloblib(HSQUIRRELVM v);
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
-
-#endif /*_SQSTDBLOB_H_*/

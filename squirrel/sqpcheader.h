@@ -1,6 +1,7 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQPCHEADER_H_
-#define _SQPCHEADER_H_
+#pragma once
+
+// IWYU pragma: begin_exports
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #include <crtdbg.h>
@@ -19,4 +20,4 @@
 
 #include <squirrel.h>
 
-#endif //_SQPCHEADER_H_
+// IWYU pragma: end_exports

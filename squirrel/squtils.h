@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQUTILS_H_
-#define _SQUTILS_H_
+#pragma once
 
 void *sq_vm_malloc(SQUnsignedInteger size);
 void *sq_vm_realloc(void *p, SQUnsignedInteger oldsize, SQUnsignedInteger size);
@@ -133,5 +132,3 @@ private:
 	SQUnsignedInteger _size;
 	SQUnsignedInteger _allocated;
 };
-
-#endif //_SQUTILS_H_

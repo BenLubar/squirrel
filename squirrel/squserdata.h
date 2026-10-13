@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQUSERDATA_H_
-#define _SQUSERDATA_H_
+#pragma once
 
 struct SQUserData : SQDelegable {
 	SQUserData(SQSharedState *ss) {
@@ -39,5 +38,3 @@ struct SQUserData : SQDelegable {
 	SQUserPointer _typetag;
 	//SQChar _val[1];
 };
-
-#endif //_SQUSERDATA_H_

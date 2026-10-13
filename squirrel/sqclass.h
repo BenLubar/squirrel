@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQCLASS_H_
-#define _SQCLASS_H_
+#pragma once
 
 struct SQInstance;
 
@@ -165,5 +164,3 @@ public:
 	SQInteger _memsize;
 	SQObjectPtr _values[1];
 };
-
-#endif //_SQCLASS_H_

@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQARRAY_H_
-#define _SQARRAY_H_
+#pragma once
 
 struct SQArray : public CHAINABLE_OBJ {
 private:
@@ -104,4 +103,3 @@ public:
 
 	SQObjectPtrVec _values;
 };
-#endif //_SQARRAY_H_

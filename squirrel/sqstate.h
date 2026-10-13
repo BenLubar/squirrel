@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQSTATE_H_
-#define _SQSTATE_H_
+#pragma once
 
 #include "sqobject.h"
 #include "squtils.h"
@@ -134,5 +133,3 @@ private:
 #define _weakref_ddel _table(_sharedstate->_weakref_default_delegate)
 
 bool CompileTypemask(SQIntVec &res, const SQChar *typemask);
-
-#endif //_SQSTATE_H_

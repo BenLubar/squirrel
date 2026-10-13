@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQTABLE_H_
-#define _SQTABLE_H_
+#pragma once
 /*
  * The following code is based on Lua 4.0 (Copyright 1994-2002 Tecgraf, PUC-Rio.)
  * http://www.lua.org/copyright.html#4
@@ -112,5 +111,3 @@ public:
 		sq_delete(this, SQTable);
 	}
 };
-
-#endif //_SQTABLE_H_

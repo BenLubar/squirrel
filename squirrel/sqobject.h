@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQOBJECT_H_
-#define _SQOBJECT_H_
+#pragma once
 
 #include "squtils.h"
 
@@ -345,5 +344,3 @@ typedef sqvector<SQObjectPtr> SQObjectPtrVec;
 typedef sqvector<SQInteger> SQIntVec;
 const SQChar *GetTypeName(const SQObjectPtr &obj1);
 const SQChar *IdType2Name(SQObjectType type);
-
-#endif //_SQOBJECT_H_

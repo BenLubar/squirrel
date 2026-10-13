@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQLEXER_H_
-#define _SQLEXER_H_
+#pragma once
 
 #ifdef SQUNICODE
 typedef SQChar LexChar;
@@ -52,5 +51,3 @@ public:
 	CompilerErrorFunc _errfunc;
 	void *_errtarget;
 };
-
-#endif

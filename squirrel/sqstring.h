@@ -1,6 +1,5 @@
 /*  see copyright notice in squirrel.h */
-#ifndef _SQSTRING_H_
-#define _SQSTRING_H_
+#pragma once
 
 inline SQHash _hashstr(const SQChar *s, size_t l) {
 	SQHash h = (SQHash)l; /* seed */
@@ -46,5 +45,3 @@ public:
 	SQHash _hash;
 	SQChar _val[1];
 };
-
-#endif //_SQSTRING_H_
