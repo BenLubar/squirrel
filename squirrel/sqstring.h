@@ -34,13 +34,13 @@ inline SQHash _hashstr2(const SQChar *as, size_t al, const SQChar *bs, size_t bl
 
 struct SQString : public SQRefCounted {
 	SQString() {}
-	~SQString() {}
+	~SQString() override {}
 
 public:
 	static SQString *Create(SQSharedState *ss, const SQChar *, SQInteger len = -1);
 	static SQString *Concat(SQSharedState *ss, const SQChar *a, SQInteger alen, const SQChar *b, SQInteger blen);
 	SQInteger Next(const SQObjectPtr &refpos, SQObjectPtr &outkey, SQObjectPtr &outval);
-	void Release();
+	void Release() override;
 	SQSharedState *_sharedstate;
 	SQString *_next; //chain for the string table
 	SQInteger _len;

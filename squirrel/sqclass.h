@@ -39,7 +39,7 @@ public:
 		new (newclass) SQClass(ss, base);
 		return newclass;
 	}
-	~SQClass();
+	~SQClass() override;
 	bool NewSlot(SQSharedState *ss, const SQObjectPtr &key, const SQObjectPtr &val, bool bstatic);
 	bool Get(const SQObjectPtr &key, SQObjectPtr &val) {
 		if (_members->Get(key, val)) {
@@ -68,16 +68,16 @@ public:
 			_base->Lock();
 		}
 	}
-	void Release() {
+	void Release() override {
 		if (_hook != nullptr) {
 			_hook(_typetag, 0);
 		}
 		sq_delete(this, SQClass);
 	}
-	void Finalize();
+	void Finalize() override;
 #ifndef NO_GARBAGE_COLLECTOR
-	void Mark(SQCollectable **);
-	SQObjectType GetType() { return OT_CLASS; }
+	void Mark(SQCollectable **) override;
+	SQObjectType GetType() override { return OT_CLASS; }
 #endif
 	SQInteger Next(const SQObjectPtr &refpos, SQObjectPtr &outkey, SQObjectPtr &outval);
 	SQInstance *CreateInstance();
@@ -121,7 +121,7 @@ public:
 		}
 		return newinst;
 	}
-	~SQInstance();
+	~SQInstance() override;
 	bool Get(const SQObjectPtr &key, SQObjectPtr &val) {
 		if (_class->_members->Get(key, val)) {
 			if (_isfield(val)) {
@@ -142,7 +142,7 @@ public:
 		}
 		return false;
 	}
-	void Release() {
+	void Release() override {
 		_uiRef++;
 		if (_hook != nullptr) {
 			_hook(_userpointer, 0);
@@ -155,13 +155,13 @@ public:
 		this->~SQInstance();
 		SQ_FREE(this, size);
 	}
-	void Finalize();
+	void Finalize() override;
 #ifndef NO_GARBAGE_COLLECTOR
-	void Mark(SQCollectable **);
-	SQObjectType GetType() { return OT_INSTANCE; }
+	void Mark(SQCollectable **) override;
+	SQObjectType GetType() override { return OT_INSTANCE; }
 #endif
 	bool InstanceOf(SQClass *trg);
-	bool GetMetaMethod(SQVM *v, SQMetaMethod mm, SQObjectPtr &res);
+	bool GetMetaMethod(SQVM *v, SQMetaMethod mm, SQObjectPtr &res) override;
 
 	SQClass *_class;
 	SQUserPointer _userpointer;

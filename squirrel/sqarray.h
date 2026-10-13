@@ -14,7 +14,7 @@ private:
 		INIT_CHAIN();
 		ADD_TO_CHAIN(&_ss(this)->_gc_chain, this);
 	}
-	~SQArray() {
+	~SQArray() override {
 		REMOVE_FROM_CHAIN(&_ss(this)->_gc_chain, this);
 	}
 
@@ -25,10 +25,10 @@ public:
 		return newarray;
 	}
 #ifndef NO_GARBAGE_COLLECTOR
-	void Mark(SQCollectable **chain);
-	SQObjectType GetType() { return OT_ARRAY; }
+	void Mark(SQCollectable **chain) override;
+	SQObjectType GetType() override { return OT_ARRAY; }
 #endif
-	void Finalize() {
+	void Finalize() override {
 		_values.resize(0);
 	}
 	bool Get(const SQInteger nidx, SQObjectPtr &val) {
@@ -103,7 +103,7 @@ public:
 		ShrinkIfNeeded();
 		return true;
 	}
-	void Release() {
+	void Release() override {
 		sq_delete(this, SQArray);
 	}
 

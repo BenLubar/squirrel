@@ -3,6 +3,7 @@
 
 #include "sqobject.h"
 #include "sqopcodes.h"
+
 #define MAX_NATIVE_CALLS 100
 #define MIN_STACK_OVERHEAD 15
 
@@ -59,7 +60,7 @@ public:
 		ET_RESUME_VM,
 		ET_RESUME_THROW_VM };
 	SQVM(SQSharedState *ss);
-	~SQVM();
+	~SQVM() override;
 	bool Init(SQVM *friendvm, SQInteger stacksize);
 	bool Execute(SQObjectPtr &func, SQInteger nargs, SQInteger stackbase, SQObjectPtr &outres, SQBool raiseerror, ExecutionType et = ET_CALL);
 	//starts a native call return when the NATIVE closure returns
@@ -120,10 +121,10 @@ public:
 #endif
 
 #ifndef NO_GARBAGE_COLLECTOR
-	void Mark(SQCollectable **chain);
-	SQObjectType GetType() { return OT_THREAD; }
+	void Mark(SQCollectable **chain) override;
+	SQObjectType GetType() override { return OT_THREAD; }
 #endif
-	void Finalize();
+	void Finalize() override;
 	void GrowCallStack() {
 		SQInteger newsize = _alloccallsstacksize * 2;
 		_callstackdata.resize(newsize);
@@ -132,7 +133,7 @@ public:
 	}
 	bool EnterFrame(SQInteger newbase, SQInteger newtop, bool tailcall);
 	void LeaveFrame();
-	void Release() { sq_delete(this, SQVM); }
+	void Release() override { sq_delete(this, SQVM); }
 	////////////////////////////////////////////////////////////////////////////
 	//stack functions for the api
 	void Remove(SQInteger n);

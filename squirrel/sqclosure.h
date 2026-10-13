@@ -34,7 +34,7 @@ public:
 		_CONSTRUCT_VECTOR(SQObjectPtr, func->_ndefaultparams, nc->_defaultparams);
 		return nc;
 	}
-	void Release() {
+	void Release() override {
 		SQFunctionProto *f = _function;
 		SQInteger size = _CALC_CLOSURE_SIZE(f);
 		_DESTRUCT_VECTOR(SQObjectPtr, f->_noutervalues, _outervalues);
@@ -59,18 +59,18 @@ public:
 		_COPY_VECTOR(ret->_defaultparams, _defaultparams, f->_ndefaultparams);
 		return ret;
 	}
-	~SQClosure();
+	~SQClosure() override;
 
 	bool Save(SQVM *v, SQUserPointer up, SQWRITEFUNC write);
 	static bool Load(SQVM *v, SQUserPointer up, SQREADFUNC read, SQObjectPtr &ret);
 #ifndef NO_GARBAGE_COLLECTOR
-	void Mark(SQCollectable **chain);
-	void Finalize() {
+	void Mark(SQCollectable **chain) override;
+	void Finalize() override {
 		SQFunctionProto *f = _function;
 		_NULL_SQOBJECT_VECTOR(_outervalues, f->_noutervalues);
 		_NULL_SQOBJECT_VECTOR(_defaultparams, f->_ndefaultparams);
 	}
-	SQObjectType GetType() { return OT_CLOSURE; }
+	SQObjectType GetType() override { return OT_CLOSURE; }
 #endif
 	SQWeakRef *_env;
 	SQWeakRef *_root;
@@ -96,17 +96,17 @@ public:
 		new (nc) SQOuter(ss, outer);
 		return nc;
 	}
-	~SQOuter() { REMOVE_FROM_CHAIN(&_ss(this)->_gc_chain, this); }
+	~SQOuter() override { REMOVE_FROM_CHAIN(&_ss(this)->_gc_chain, this); }
 
-	void Release() {
+	void Release() override {
 		this->~SQOuter();
 		sq_vm_free(this, sizeof(SQOuter));
 	}
 
 #ifndef NO_GARBAGE_COLLECTOR
-	void Mark(SQCollectable **chain);
-	void Finalize() { _value.Null(); }
-	SQObjectType GetType() { return OT_OUTER; }
+	void Mark(SQCollectable **chain) override;
+	void Finalize() override { _value.Null(); }
+	SQObjectType GetType() override { return OT_OUTER; }
 #endif
 
 	SQObjectPtr *_valptr; /* pointer to value on stack, or _value below */
@@ -136,7 +136,7 @@ public:
 		new (nc) SQGenerator(ss, closure);
 		return nc;
 	}
-	~SQGenerator() {
+	~SQGenerator() override {
 		REMOVE_FROM_CHAIN(&_ss(this)->_gc_chain, this);
 	}
 	void Kill() {
@@ -144,19 +144,19 @@ public:
 		_stack.resize(0);
 		_closure.Null();
 	}
-	void Release() {
+	void Release() override {
 		sq_delete(this, SQGenerator);
 	}
 
 	bool Yield(SQVM *v, SQInteger target);
 	bool Resume(SQVM *v, SQObjectPtr &dest);
 #ifndef NO_GARBAGE_COLLECTOR
-	void Mark(SQCollectable **chain);
-	void Finalize() {
+	void Mark(SQCollectable **chain) override;
+	void Finalize() override {
 		_stack.resize(0);
 		_closure.Null();
 	}
-	SQObjectType GetType() { return OT_GENERATOR; }
+	SQObjectType GetType() override { return OT_GENERATOR; }
 #endif
 	SQObjectPtr _closure;
 	SQObjectPtrVec _stack;
@@ -199,11 +199,11 @@ public:
 		ret->_nparamscheckmax = _nparamscheckmax;
 		return ret;
 	}
-	~SQNativeClosure() {
+	~SQNativeClosure() override {
 		__ObjRelease(_env);
 		REMOVE_FROM_CHAIN(&_ss(this)->_gc_chain, this);
 	}
-	void Release() {
+	void Release() override {
 		SQInteger size = _CALC_NATVIVECLOSURE_SIZE(_noutervalues);
 		_DESTRUCT_VECTOR(SQObjectPtr, _noutervalues, _outervalues);
 		this->~SQNativeClosure();
@@ -211,9 +211,9 @@ public:
 	}
 
 #ifndef NO_GARBAGE_COLLECTOR
-	void Mark(SQCollectable **chain);
-	void Finalize() { _NULL_SQOBJECT_VECTOR(_outervalues, _noutervalues); }
-	SQObjectType GetType() { return OT_NATIVECLOSURE; }
+	void Mark(SQCollectable **chain) override;
+	void Finalize() override { _NULL_SQOBJECT_VECTOR(_outervalues, _noutervalues); }
+	SQObjectType GetType() override { return OT_NATIVECLOSURE; }
 #endif
 	SQInteger _nparamscheckmin;
 	SQInteger _nparamscheckmax;

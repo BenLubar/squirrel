@@ -14,7 +14,7 @@ struct SQUserData : SQDelegable {
 		INIT_CHAIN();
 		ADD_TO_CHAIN(&_ss(this)->_gc_chain, this);
 	}
-	~SQUserData() {
+	~SQUserData() override {
 		REMOVE_FROM_CHAIN(&_ss(this)->_gc_chain, this);
 		SetDelegate(nullptr);
 	}
@@ -26,11 +26,11 @@ struct SQUserData : SQDelegable {
 		return ud;
 	}
 #ifndef NO_GARBAGE_COLLECTOR
-	void Mark(SQCollectable **chain);
-	void Finalize() { SetDelegate(nullptr); }
-	SQObjectType GetType() { return OT_USERDATA; }
+	void Mark(SQCollectable **chain) override;
+	void Finalize() override { SetDelegate(nullptr); }
+	SQObjectType GetType() override { return OT_USERDATA; }
 #endif
-	void Release() {
+	void Release() override {
 		if (_hook != nullptr) {
 			_hook((SQUserPointer)sq_aligning(this + 1), _size);
 		}

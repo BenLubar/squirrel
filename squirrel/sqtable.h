@@ -62,9 +62,9 @@ public:
 		newtable->_delegate = nullptr;
 		return newtable;
 	}
-	void Finalize();
+	void Finalize() override;
 	SQTable *Clone();
-	~SQTable() {
+	~SQTable() override {
 		SetDelegate(nullptr);
 		REMOVE_FROM_CHAIN(&_sharedstate->_gc_chain, this);
 		for (SQInteger i = 0; i < _numofnodes; i++) {
@@ -73,8 +73,8 @@ public:
 		SQ_FREE(_nodes, _numofnodes * sizeof(_HashNode));
 	}
 #ifndef NO_GARBAGE_COLLECTOR
-	void Mark(SQCollectable **chain);
-	SQObjectType GetType() { return OT_TABLE; }
+	void Mark(SQCollectable **chain) override;
+	SQObjectType GetType() override { return OT_TABLE; }
 #endif
 	inline _HashNode *_Get(const SQObjectPtr &key, SQHash hash) {
 		_HashNode *n = &_nodes[hash];
@@ -111,7 +111,7 @@ public:
 
 	SQInteger CountUsed() { return _usednodes; }
 	void Clear();
-	void Release() {
+	void Release() override {
 		sq_delete(this, SQTable);
 	}
 };

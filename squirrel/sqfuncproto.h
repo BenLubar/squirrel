@@ -45,7 +45,7 @@ typedef sqvector<SQLineInfo> SQLineInfoVec;
 struct SQFunctionProto : public CHAINABLE_OBJ {
 private:
 	SQFunctionProto(SQSharedState *ss);
-	~SQFunctionProto();
+	~SQFunctionProto() override;
 
 public:
 	static SQFunctionProto *Create(SQSharedState *ss, SQInteger ninstructions,
@@ -80,7 +80,7 @@ public:
 		_CONSTRUCT_VECTOR(SQLocalVarInfo, f->_nlocalvarinfos, f->_localvarinfos);
 		return f;
 	}
-	void Release() {
+	void Release() override {
 		_DESTRUCT_VECTOR(SQObjectPtr, _nliterals, _literals);
 		_DESTRUCT_VECTOR(SQObjectPtr, _nparameters, _parameters);
 		_DESTRUCT_VECTOR(SQObjectPtr, _nfunctions, _functions);
@@ -97,9 +97,9 @@ public:
 	bool Save(SQVM *v, SQUserPointer up, SQWRITEFUNC write);
 	static bool Load(SQVM *v, SQUserPointer up, SQREADFUNC read, SQObjectPtr &ret);
 #ifndef NO_GARBAGE_COLLECTOR
-	void Mark(SQCollectable **chain);
-	void Finalize() { _NULL_SQOBJECT_VECTOR(_literals, _nliterals); }
-	SQObjectType GetType() { return OT_FUNCPROTO; }
+	void Mark(SQCollectable **chain) override;
+	void Finalize() override { _NULL_SQOBJECT_VECTOR(_literals, _nliterals); }
+	SQObjectType GetType() override { return OT_FUNCPROTO; }
 #endif
 	SQObjectPtr _sourcename;
 	SQObjectPtr _name;
