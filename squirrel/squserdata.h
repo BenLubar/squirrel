@@ -19,7 +19,7 @@ struct SQUserData : SQDelegable {
 		SetDelegate(nullptr);
 	}
 	static SQUserData *Create(SQSharedState *ss, SQInteger size) {
-		SQUserData *ud = (SQUserData *)SQ_MALLOC(sq_aligning(sizeof(SQUserData)) + size);
+		SQUserData *ud = static_cast<SQUserData *>(SQ_MALLOC(sq_aligning(sizeof(SQUserData)) + size));
 		new (ud) SQUserData(ss);
 		ud->_size = size;
 		ud->_typetag = nullptr;

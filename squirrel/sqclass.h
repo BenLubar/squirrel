@@ -35,7 +35,7 @@ struct SQClass : public CHAINABLE_OBJ {
 
 public:
 	static SQClass *Create(SQSharedState *ss, SQClass *base) {
-		SQClass *newclass = (SQClass *)SQ_MALLOC(sizeof(SQClass));
+		SQClass *newclass = static_cast<SQClass *>(SQ_MALLOC(sizeof(SQClass)));
 		new (newclass) SQClass(ss, base);
 		return newclass;
 	}
@@ -105,19 +105,19 @@ struct SQInstance : public SQDelegable {
 public:
 	static SQInstance *Create(SQSharedState *ss, SQClass *theclass) {
 		SQInteger size = calcinstancesize(theclass);
-		SQInstance *newinst = (SQInstance *)SQ_MALLOC(size);
+		SQInstance *newinst = static_cast<SQInstance *>(SQ_MALLOC(size));
 		new (newinst) SQInstance(ss, theclass, size);
 		if (theclass->_udsize != 0) {
-			newinst->_userpointer = ((unsigned char *)newinst) + (size - theclass->_udsize);
+			newinst->_userpointer = (reinterpret_cast<unsigned char *>(newinst)) + (size - theclass->_udsize);
 		}
 		return newinst;
 	}
 	SQInstance *Clone(SQSharedState *ss) {
 		SQInteger size = calcinstancesize(_class);
-		SQInstance *newinst = (SQInstance *)SQ_MALLOC(size);
+		SQInstance *newinst = static_cast<SQInstance *>(SQ_MALLOC(size));
 		new (newinst) SQInstance(ss, this, size);
 		if (_class->_udsize != 0) {
-			newinst->_userpointer = ((unsigned char *)newinst) + (size - _class->_udsize);
+			newinst->_userpointer = (reinterpret_cast<unsigned char *>(newinst)) + (size - _class->_udsize);
 		}
 		return newinst;
 	}

@@ -28,13 +28,13 @@ static bool str2num(const SQChar *s, SQObjectPtr &res, SQInteger base) {
 		e++;
 	}
 	if (isfloat) {
-		SQFloat r = SQFloat(scstrtod(s, &end));
+		SQFloat r = static_cast<SQFloat>(scstrtod(s, &end));
 		if (s == end) {
 			return false;
 		}
 		res = r;
 	} else {
-		SQInteger r = SQInteger(scstrtol(s, &end, (int)base));
+		SQInteger r = static_cast<SQInteger>(scstrtol(s, &end, static_cast<int>(base)));
 		if (s == end) {
 			return false;
 		}
@@ -325,7 +325,7 @@ void sq_base_register(HSQUIRRELVM v) {
 }
 
 static SQInteger default_delegate_len(HSQUIRRELVM v) {
-	v->Push(SQInteger(sq_getsize(v, 1)));
+	v->Push((sq_getsize(v, 1)));
 	return 1;
 }
 
@@ -346,7 +346,7 @@ static SQInteger default_delegate_tofloat(HSQUIRRELVM v) {
 			v->Push(SQObjectPtr(tofloat(o)));
 			break;
 		case OT_BOOL:
-			v->Push(SQObjectPtr((SQFloat)(_integer(o) ? 1 : 0)));
+			v->Push(SQObjectPtr(static_cast<SQFloat>(_integer(o) ? 1 : 0)));
 			break;
 		default:
 			v->PushNull();
@@ -376,7 +376,7 @@ static SQInteger default_delegate_tointeger(HSQUIRRELVM v) {
 			v->Push(SQObjectPtr(tointeger(o)));
 			break;
 		case OT_BOOL:
-			v->Push(SQObjectPtr(_integer(o) ? (SQInteger)1 : (SQInteger)0));
+			v->Push(SQObjectPtr(_integer(o) ? static_cast<SQInteger>(1) : static_cast<SQInteger>(0)));
 			break;
 		default:
 			v->PushNull();
@@ -403,7 +403,7 @@ static SQInteger obj_clear(HSQUIRRELVM v) {
 
 static SQInteger number_delegate_tochar(HSQUIRRELVM v) {
 	SQObject &o = stack_get(v, 1);
-	SQChar c = (SQChar)tointeger(o);
+	SQChar c = static_cast<SQChar> tointeger(o);
 	v->Push(SQString::Create(_ss(v), (const SQChar *)&c, 1));
 	return 1;
 }
@@ -453,7 +453,7 @@ static SQInteger table_filter(HSQUIRRELVM v) {
 	SQObjectPtr val;
 	SQInteger nitr;
 	while ((nitr = tbl->Next(false, itr, key, val)) != -1) {
-		itr = (SQInteger)nitr;
+		itr = nitr;
 
 		v->Push(o);
 		v->Push(key);
@@ -482,7 +482,7 @@ static SQInteger table_map(HSQUIRRELVM v) {
 	SQObjectPtr key;
 	SQObjectPtr val;
 	while ((nitr = tbl->Next(false, itr, key, val)) != -1) {
-		itr = (SQInteger)nitr;
+		itr = nitr;
 
 		v->Push(o);
 		v->Push(key);
@@ -948,7 +948,7 @@ static SQInteger string_find(HSQUIRRELVM v) {
 		if ((sq_getsize(v, 1) > start_idx) && (start_idx >= 0)) {
 			ret = scstrstr(&str[start_idx], substr);
 			if (ret != nullptr) {
-				sq_pushinteger(v, (SQInteger)(ret - str));
+				sq_pushinteger(v, static_cast<SQInteger>(ret - str));
 				return 1;
 			}
 		}
@@ -1069,10 +1069,10 @@ static SQInteger closure_getinfos(HSQUIRRELVM v) {
 		SQObjectPtr params = SQArray::Create(_ss(v), nparams);
 		SQObjectPtr defparams = SQArray::Create(_ss(v), f->_ndefaultparams);
 		for (SQInteger n = 0; n < f->_nparameters; n++) {
-			_array(params)->Set((SQInteger)n, f->_parameters[n]);
+			_array(params)->Set(n, f->_parameters[n]);
 		}
 		for (SQInteger j = 0; j < f->_ndefaultparams; j++) {
-			_array(defparams)->Set((SQInteger)j, _closure(o)->_defaultparams[j]);
+			_array(defparams)->Set(j, _closure(o)->_defaultparams[j]);
 		}
 		if (f->_varparams != 0) {
 			_array(params)->Set(nparams - 1, SQString::Create(_ss(v), _SC("..."), -1));
@@ -1094,7 +1094,7 @@ static SQInteger closure_getinfos(HSQUIRRELVM v) {
 			typecheck =
 					SQArray::Create(_ss(v), nc->_typecheck.size());
 			for (SQUnsignedInteger n = 0; n < nc->_typecheck.size(); n++) {
-				_array(typecheck)->Set((SQInteger)n, nc->_typecheck[n]);
+				_array(typecheck)->Set(static_cast<SQInteger>(n), nc->_typecheck[n]);
 			}
 		}
 		res->NewSlot(SQString::Create(_ss(v), _SC("typecheck"), -1), typecheck);

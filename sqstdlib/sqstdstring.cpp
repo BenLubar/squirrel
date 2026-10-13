@@ -339,7 +339,7 @@ static SQInteger _string_escape(HSQUIRRELVM v) {
 	const SQInteger maxescsize = 4;
 #endif
 	SQInteger destcharsize = (size * maxescsize); //assumes every char could be escaped
-	resstr = dest = (SQChar *)sq_getscratchpad(v, destcharsize * sizeof(SQChar));
+	resstr = dest = sq_getscratchpad(v, destcharsize * sizeof(SQChar));
 	SQChar c;
 	SQChar escch;
 	SQInteger escaped = 0;
@@ -440,7 +440,7 @@ static SQInteger _string_endswith(HSQUIRRELVM v) {
 	}
 
 static SQInteger _rexobj_releasehook(SQUserPointer p, SQInteger SQ_UNUSED_ARG(size)) {
-	SQRex *self = ((SQRex *)p);
+	SQRex *self = (static_cast<SQRex *>(p));
 	sqstd_rex_free(self);
 	return 1;
 }

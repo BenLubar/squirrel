@@ -79,18 +79,18 @@ static SQInteger sqstd_rex_newnode(SQRex *exp, SQRexNodeType type) {
 	if (exp->_nallocated < (exp->_nsize + 1)) {
 		SQInteger oldsize = exp->_nallocated;
 		exp->_nallocated *= 2;
-		exp->_nodes = (SQRexNode *)sq_realloc(exp->_nodes, oldsize * sizeof(SQRexNode), exp->_nallocated * sizeof(SQRexNode));
+		exp->_nodes = static_cast<SQRexNode *>(sq_realloc(exp->_nodes, oldsize * sizeof(SQRexNode), exp->_nallocated * sizeof(SQRexNode)));
 	}
 	exp->_nodes[exp->_nsize++] = n;
 	SQInteger newid = exp->_nsize - 1;
-	return (SQInteger)newid;
+	return newid;
 }
 
 static void sqstd_rex_error(SQRex *exp, const SQChar *error) {
 	if (exp->_error != nullptr) {
 		*exp->_error = error;
 	}
-	longjmp(*((jmp_buf *)exp->_jmpbuf), -1);
+	longjmp(*(static_cast<jmp_buf *>(exp->_jmpbuf)), -1);
 }
 
 static void sqstd_rex_expect(SQRex *exp, SQInteger n) {
@@ -347,7 +347,7 @@ static SQInteger sqstd_rex_element(SQRex *exp) {
 			if (isdigit(*exp->_p) == 0) {
 				sqstd_rex_error(exp, _SC("number expected"));
 			}
-			p0 = (unsigned short)sqstd_rex_parsenumber(exp);
+			p0 = static_cast<unsigned short>(sqstd_rex_parsenumber(exp));
 			/*******************************/
 			switch (*exp->_p) {
 				case '}':
@@ -358,7 +358,7 @@ static SQInteger sqstd_rex_element(SQRex *exp) {
 					exp->_p++;
 					p1 = 0xFFFF;
 					if (isdigit(*exp->_p) != 0) {
-						p1 = (unsigned short)sqstd_rex_parsenumber(exp);
+						p1 = static_cast<unsigned short>(sqstd_rex_parsenumber(exp));
 					}
 					sqstd_rex_expect(exp, '}');
 					break;
@@ -664,11 +664,11 @@ static const SQChar *sqstd_rex_matchnode(SQRex *exp, SQRexNode *node, const SQCh
 
 /* public api */
 SQRex *sqstd_rex_compile(const SQChar *pattern, const SQChar **error) {
-	SQRex *volatile exp = (SQRex *)sq_malloc(sizeof(SQRex)); // "volatile" is needed for setjmp()
+	SQRex *volatile exp = static_cast<SQRex *>(sq_malloc(sizeof(SQRex))); // "volatile" is needed for setjmp()
 	exp->_eol = exp->_bol = nullptr;
 	exp->_p = pattern;
-	exp->_nallocated = (SQInteger)scstrlen(pattern) * sizeof(SQChar);
-	exp->_nodes = (SQRexNode *)sq_malloc(exp->_nallocated * sizeof(SQRexNode));
+	exp->_nallocated = static_cast<SQInteger>(scstrlen(pattern)) * sizeof(SQChar);
+	exp->_nodes = static_cast<SQRexNode *>(sq_malloc(exp->_nallocated * sizeof(SQRexNode)));
 	exp->_nsize = 0;
 	exp->_matches = nullptr;
 	exp->_nsubexpr = 0;
@@ -699,7 +699,7 @@ SQRex *sqstd_rex_compile(const SQChar *pattern, const SQChar **error) {
 			scprintf(_SC("\n"));
 		}
 #endif
-		exp->_matches = (SQRexMatch *)sq_malloc(exp->_nsubexpr * sizeof(SQRexMatch));
+		exp->_matches = static_cast<SQRexMatch *>(sq_malloc(exp->_nsubexpr * sizeof(SQRexMatch)));
 		memset(exp->_matches, 0, exp->_nsubexpr * sizeof(SQRexMatch));
 	} else {
 		sqstd_rex_free(exp);

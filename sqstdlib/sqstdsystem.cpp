@@ -57,12 +57,12 @@ static SQInteger _system_system(HSQUIRRELVM v) {
 }
 
 static SQInteger _system_clock(HSQUIRRELVM v) {
-	sq_pushfloat(v, ((SQFloat)clock()) / (SQFloat)CLOCKS_PER_SEC);
+	sq_pushfloat(v, (static_cast<SQFloat>(clock())) / static_cast<SQFloat> CLOCKS_PER_SEC);
 	return 1;
 }
 
 static SQInteger _system_time(HSQUIRRELVM v) {
-	SQInteger t = (SQInteger)time(nullptr);
+	SQInteger t = static_cast<SQInteger>(time(nullptr));
 	sq_pushinteger(v, t);
 	return 1;
 }
@@ -101,7 +101,7 @@ static SQInteger _system_date(HSQUIRRELVM v) {
 		sq_getinteger(v, 2, &it);
 		t = it;
 		if (sq_gettop(v) > 2) {
-			sq_getinteger(v, 3, (SQInteger *)&format);
+			sq_getinteger(v, 3, &format);
 		}
 	} else {
 		time(&t);

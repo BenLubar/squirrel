@@ -97,7 +97,7 @@ public:
 		_compilererror[0] = _SC('\0');
 	}
 	static void ThrowError(void *ud, const SQChar *s) {
-		SQCompiler *c = (SQCompiler *)ud;
+		SQCompiler *c = static_cast<SQCompiler *>(ud);
 		c->Error(s);
 	}
 	void Error(const SQChar *s, ...) {
@@ -1072,7 +1072,7 @@ public:
 			target = _fs->PushTarget();
 		}
 		if (sizeof(SQFloat) == sizeof(SQInt32)) {
-			_fs->AddInstruction(_OP_LOADFLOAT, target, *((SQInt32 *)&value));
+			_fs->AddInstruction(_OP_LOADFLOAT, target, *(reinterpret_cast<SQInt32 *>(&value)));
 		} else {
 			_fs->AddInstruction(_OP_LOAD, target, _fs->GetNumericConstant(value));
 		}

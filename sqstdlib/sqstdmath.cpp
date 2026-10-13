@@ -27,7 +27,7 @@ static SQInteger math_srand(HSQUIRRELVM v) {
 	if (SQ_FAILED(sq_getinteger(v, 2, &i))) {
 		return sq_throwerror(v, _SC("invalid param"));
 	}
-	srand((unsigned int)i);
+	srand(static_cast<unsigned int>(i));
 	return 0;
 }
 
@@ -39,7 +39,7 @@ static SQInteger math_rand(HSQUIRRELVM v) {
 static SQInteger math_abs(HSQUIRRELVM v) {
 	SQInteger n;
 	sq_getinteger(v, 2, &n);
-	sq_pushinteger(v, (SQInteger)abs((int)n));
+	sq_pushinteger(v, static_cast<SQInteger>(abs(static_cast<int>(n))));
 	return 1;
 }
 
@@ -101,7 +101,7 @@ SQRESULT sqstd_register_mathlib(HSQUIRRELVM v) {
 	sq_pushinteger(v, RAND_MAX);
 	sq_newslot(v, -3, SQFalse);
 	sq_pushstring(v, _SC("PI"), -1);
-	sq_pushfloat(v, (SQFloat)M_PI);
+	sq_pushfloat(v, static_cast<SQFloat>(M_PI));
 	sq_newslot(v, -3, SQFalse);
 	return SQ_OK;
 }

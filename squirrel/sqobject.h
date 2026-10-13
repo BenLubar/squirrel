@@ -279,7 +279,7 @@ struct SQObjectPtr : public SQObject {
 		SQObjectType tOldType = _type;
 		SQObjectValue unOldVal = _unVal;
 		_type = OT_NULL;
-		_unVal.raw = (SQRawObjectVal)NULL;
+		_unVal.raw = static_cast<SQRawObjectVal>(NULL);
 		__Release(tOldType, unOldVal);
 	}
 

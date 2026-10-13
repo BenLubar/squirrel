@@ -20,7 +20,7 @@ private:
 
 public:
 	static SQArray *Create(SQSharedState *ss, SQInteger nInitialSize) {
-		SQArray *newarray = (SQArray *)SQ_MALLOC(sizeof(SQArray));
+		SQArray *newarray = static_cast<SQArray *>(SQ_MALLOC(sizeof(SQArray)));
 		new (newarray) SQArray(ss, nInitialSize);
 		return newarray;
 	}
@@ -32,7 +32,7 @@ public:
 		_values.resize(0);
 	}
 	bool Get(const SQInteger nidx, SQObjectPtr &val) {
-		if (nidx >= 0 && nidx < (SQInteger)_values.size()) {
+		if (nidx >= 0 && nidx < static_cast<SQInteger>(_values.size())) {
 			SQObjectPtr &o = _values[nidx];
 			val = _realval(o);
 			return true;
@@ -41,7 +41,7 @@ public:
 		}
 	}
 	bool Set(const SQInteger nidx, const SQObjectPtr &val) {
-		if (nidx >= 0 && nidx < (SQInteger)_values.size()) {
+		if (nidx >= 0 && nidx < static_cast<SQInteger>(_values.size())) {
 			_values[nidx] = val;
 			return true;
 		} else {
@@ -52,7 +52,7 @@ public:
 		SQUnsignedInteger idx = TranslateIndex(refpos);
 		while (idx < _values.size()) {
 			//first found
-			outkey = (SQInteger)idx;
+			outkey = static_cast<SQInteger>(idx);
 			SQObjectPtr &o = _values[idx];
 			outval = _realval(o);
 			//return idx for the next iteration
@@ -84,7 +84,7 @@ public:
 		ShrinkIfNeeded();
 	}
 	bool Insert(SQInteger idx, const SQObject &val) {
-		if (idx < 0 || idx > (SQInteger)_values.size()) {
+		if (idx < 0 || idx > static_cast<SQInteger>(_values.size())) {
 			return false;
 		}
 		_values.insert(idx, val);
@@ -96,7 +96,7 @@ public:
 		}
 	}
 	bool Remove(SQInteger idx) {
-		if (idx < 0 || idx >= (SQInteger)_values.size()) {
+		if (idx < 0 || idx >= static_cast<SQInteger>(_values.size())) {
 			return false;
 		}
 		_values.remove(idx);

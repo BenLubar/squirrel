@@ -4,30 +4,30 @@
 #include "sqobject.h"
 
 inline SQHash _hashstr(const SQChar *s, size_t l) {
-	SQHash h = (SQHash)l; /* seed */
+	SQHash h = static_cast<SQHash>(l); /* seed */
 	size_t step = (l >> 5) + 1; /* if string is too long, don't hash all its chars */
 	size_t l1;
 	for (l1 = l; l1 >= step; l1 -= step) {
-		h = h ^ ((h << 5) + (h >> 2) + ((unsigned short)s[l1 - 1]));
+		h = h ^ ((h << 5) + (h >> 2) + (static_cast<unsigned short>(s[l1 - 1])));
 	}
 	return h;
 }
 
 inline SQHash _hashstr2(const SQChar *as, size_t al, const SQChar *bs, size_t bl) {
 	size_t l = al + bl;
-	SQHash h = (SQHash)l; /* seed */
-	SQInteger step = (SQInteger)((l >> 5) + 1); /* if string is too long, don't hash all its chars */
-	SQInteger l1 = (SQInteger)l;
+	SQHash h = static_cast<SQHash>(l); /* seed */
+	SQInteger step = static_cast<SQInteger>((l >> 5) + 1); /* if string is too long, don't hash all its chars */
+	SQInteger l1 = static_cast<SQInteger>(l);
 	for (; l1 >= step; l1 -= step) {
 		SQInteger idx = l1 - 1 - al;
 		if (idx < 0) {
 			break;
 		}
-		h = h ^ ((h << 5) + (h >> 2) + ((unsigned short)bs[idx]));
+		h = h ^ ((h << 5) + (h >> 2) + (static_cast<unsigned short>(bs[idx])));
 	}
 	for (; l1 >= step; l1 -= step) {
 		SQInteger idx = l1 - 1;
-		h = h ^ ((h << 5) + (h >> 2) + ((unsigned short)as[idx]));
+		h = h ^ ((h << 5) + (h >> 2) + (static_cast<unsigned short>(as[idx])));
 	}
 	return h;
 }

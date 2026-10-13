@@ -86,7 +86,7 @@ SQInteger _stream_readn(HSQUIRRELVM v) {
 		case 'd': {
 			double d;
 			SAFE_READN(&d, sizeof(double));
-			sq_pushfloat(v, (SQFloat)d);
+			sq_pushfloat(v, static_cast<SQFloat>(d));
 		} break;
 		default:
 			return sq_throwerror(v, _SC("invalid format"));
@@ -125,37 +125,37 @@ SQInteger _stream_writen(HSQUIRRELVM v) {
 		case 'i': {
 			SQInt32 i;
 			sq_getinteger(v, 2, &ti);
-			i = (SQInt32)ti;
+			i = static_cast<SQInt32>(ti);
 			self->Write(&i, sizeof(SQInt32));
 		} break;
 		case 's': {
 			short s;
 			sq_getinteger(v, 2, &ti);
-			s = (short)ti;
+			s = static_cast<short>(ti);
 			self->Write(&s, sizeof(short));
 		} break;
 		case 'w': {
 			unsigned short w;
 			sq_getinteger(v, 2, &ti);
-			w = (unsigned short)ti;
+			w = static_cast<unsigned short>(ti);
 			self->Write(&w, sizeof(unsigned short));
 		} break;
 		case 'c': {
 			char c;
 			sq_getinteger(v, 2, &ti);
-			c = (char)ti;
+			c = static_cast<char>(ti);
 			self->Write(&c, sizeof(char));
 		} break;
 		case 'b': {
 			unsigned char b;
 			sq_getinteger(v, 2, &ti);
-			b = (unsigned char)ti;
+			b = static_cast<unsigned char>(ti);
 			self->Write(&b, sizeof(unsigned char));
 		} break;
 		case 'f': {
 			float f;
 			sq_getfloat(v, 2, &tf);
-			f = (float)tf;
+			f = static_cast<float>(tf);
 			self->Write(&f, sizeof(float));
 		} break;
 		case 'd': {
@@ -251,7 +251,7 @@ void init_streamclass(HSQUIRRELVM v) {
 	sq_pushstring(v, _SC("std_stream"), -1);
 	if (sq_in(v, -2) == SQFalse) {
 		sq_newclass(v, SQFalse);
-		sq_settypetag(v, -1, (SQUserPointer)((SQUnsignedInteger)SQSTD_STREAM_TYPE_TAG));
+		sq_settypetag(v, -1, (SQUserPointer)(static_cast<SQUnsignedInteger>(SQSTD_STREAM_TYPE_TAG)));
 		SQInteger i = 0;
 		while (_stream_methods[i].name != nullptr) {
 			const SQRegFunction &f = _stream_methods[i];

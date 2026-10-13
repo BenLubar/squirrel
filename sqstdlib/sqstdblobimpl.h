@@ -10,7 +10,7 @@ struct SQBlob : public SQStream {
 	SQBlob(SQInteger size) {
 		_size = size;
 		_allocated = size;
-		_buf = (unsigned char *)sq_malloc(size);
+		_buf = static_cast<unsigned char *>(sq_malloc(size));
 		memset(_buf, 0, _size);
 		_ptr = 0;
 		_owns = true;
@@ -44,7 +44,7 @@ struct SQBlob : public SQStream {
 			return false;
 		}
 		if (n != _allocated) {
-			unsigned char *newbuf = (unsigned char *)sq_malloc(n);
+			unsigned char *newbuf = static_cast<unsigned char *>(sq_malloc(n));
 			memset(newbuf, 0, n);
 			if (_size > n) {
 				memcpy(newbuf, _buf, n);

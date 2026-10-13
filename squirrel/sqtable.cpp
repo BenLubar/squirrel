@@ -50,7 +50,7 @@ void SQTable::Remove(const SQObjectPtr &key) {
 }
 
 void SQTable::AllocNodes(SQInteger nSize) {
-	_HashNode *nodes = (_HashNode *)SQ_MALLOC(sizeof(_HashNode) * nSize);
+	_HashNode *nodes = static_cast<_HashNode *>(SQ_MALLOC(sizeof(_HashNode) * nSize));
 	for (SQInteger i = 0; i < nSize; i++) {
 		_HashNode &n = nodes[i];
 		new (&n) _HashNode;
@@ -265,18 +265,18 @@ bool SQTable::NewSlot(const SQObjectPtr &key, const SQObjectPtr &val) {
 }
 
 SQInteger SQTable::Next(bool getweakrefs, const SQObjectPtr &refpos, SQObjectPtr &outkey, SQObjectPtr &outval) {
-	SQInteger idx = (SQInteger)TranslateIndex(refpos);
+	SQInteger idx = static_cast<SQInteger>(TranslateIndex(refpos));
 #ifdef KEEP_SLOT_ORDER
 	if (idx == 0 && (_firstinorder != nullptr)) {
 		outkey = _firstinorder->key;
-		outval = getweakrefs ? (SQObject)_firstinorder->val : _realval(_firstinorder->val);
+		outval = getweakrefs ? SQObject(_firstinorder->val) : _realval(_firstinorder->val);
 		return 1 + (_firstinorder - _nodes);
 	}
 	if (idx > 0 && idx <= _numofnodes) {
 		_HashNode *n = _nodes[idx - 1].nextinorder;
 		if (n != nullptr) {
 			outkey = n->key;
-			outval = getweakrefs ? (SQObject)n->val : _realval(n->val);
+			outval = getweakrefs ? SQObject(n->val) : _realval(n->val);
 			return 1 + (n - _nodes);
 		}
 	}

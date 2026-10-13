@@ -33,20 +33,20 @@ static SQInteger _blob_resize(HSQUIRRELVM v) {
 }
 
 static void __swap_dword(unsigned int *n) {
-	*n = (unsigned int)(((*n & 0xFF000000) >> 24) |
+	*n = (((*n & 0xFF000000) >> 24) |
 			((*n & 0x00FF0000) >> 8) |
 			((*n & 0x0000FF00) << 8) |
 			((*n & 0x000000FF) << 24));
 }
 
 static void __swap_word(unsigned short *n) {
-	*n = (unsigned short)((*n >> 8) & 0x00FF) | ((*n << 8) & 0xFF00);
+	*n = static_cast<unsigned short>((*n >> 8) & 0x00FF) | ((*n << 8) & 0xFF00);
 }
 
 static SQInteger _blob_swap4(HSQUIRRELVM v) {
 	SETUP_BLOB(v);
 	SQInteger num = (self->Len() - (self->Len() % 4)) >> 2;
-	unsigned int *t = (unsigned int *)self->GetBuf();
+	unsigned int *t = static_cast<unsigned int *>(self->GetBuf());
 	for (SQInteger i = 0; i < num; i++) {
 		__swap_dword(&t[i]);
 	}
@@ -56,7 +56,7 @@ static SQInteger _blob_swap4(HSQUIRRELVM v) {
 static SQInteger _blob_swap2(HSQUIRRELVM v) {
 	SETUP_BLOB(v);
 	SQInteger num = (self->Len() - (self->Len() % 2)) >> 1;
-	unsigned short *t = (unsigned short *)self->GetBuf();
+	unsigned short *t = static_cast<unsigned short *>(self->GetBuf());
 	for (SQInteger i = 0; i < num; i++) {
 		__swap_word(&t[i]);
 	}
@@ -72,7 +72,7 @@ static SQInteger _blob__set(HSQUIRRELVM v) {
 	if (idx < 0 || idx >= self->Len()) {
 		return sq_throwerror(v, _SC("index out of range"));
 	}
-	((unsigned char *)self->GetBuf())[idx] = (unsigned char)val;
+	(static_cast<unsigned char *>(self->GetBuf()))[idx] = static_cast<unsigned char>(val);
 	sq_push(v, 3);
 	return 1;
 }
@@ -89,7 +89,7 @@ static SQInteger _blob__get(HSQUIRRELVM v) {
 	if (idx < 0 || idx >= self->Len()) {
 		return sq_throwerror(v, _SC("index out of range"));
 	}
-	sq_pushinteger(v, ((unsigned char *)self->GetBuf())[idx]);
+	sq_pushinteger(v, (static_cast<unsigned char *>(self->GetBuf()))[idx]);
 	return 1;
 }
 
@@ -117,7 +117,7 @@ static SQInteger _blob__typeof(HSQUIRRELVM v) {
 }
 
 static SQInteger _blob_releasehook(SQUserPointer p, SQInteger SQ_UNUSED_ARG(size)) {
-	SQBlob *self = (SQBlob *)p;
+	SQBlob *self = static_cast<SQBlob *>(p);
 	self->~SQBlob();
 	sq_free(self, sizeof(SQBlob));
 	return 1;
@@ -182,21 +182,21 @@ static const SQRegFunction _blob_methods[] = {
 static SQInteger _g_blob_casti2f(HSQUIRRELVM v) {
 	SQInteger i;
 	sq_getinteger(v, 2, &i);
-	sq_pushfloat(v, *((const SQFloat *)&i));
+	sq_pushfloat(v, *(reinterpret_cast<const SQFloat *>(&i)));
 	return 1;
 }
 
 static SQInteger _g_blob_castf2i(HSQUIRRELVM v) {
 	SQFloat f;
 	sq_getfloat(v, 2, &f);
-	sq_pushinteger(v, *((const SQInteger *)&f));
+	sq_pushinteger(v, *(reinterpret_cast<const SQInteger *>(&f)));
 	return 1;
 }
 
 static SQInteger _g_blob_swap2(HSQUIRRELVM v) {
 	SQInteger i;
 	sq_getinteger(v, 2, &i);
-	unsigned short s = (unsigned short)i;
+	unsigned short s = static_cast<unsigned short>(i);
 	sq_pushinteger(v, ((s << 8) | ((s >> 8) & 0x00FFu)) & 0xFFFFu);
 	return 1;
 }
@@ -204,16 +204,16 @@ static SQInteger _g_blob_swap2(HSQUIRRELVM v) {
 static SQInteger _g_blob_swap4(HSQUIRRELVM v) {
 	SQInteger i;
 	sq_getinteger(v, 2, &i);
-	unsigned int t4 = (unsigned int)i;
+	unsigned int t4 = static_cast<unsigned int>(i);
 	__swap_dword(&t4);
-	sq_pushinteger(v, (SQInteger)t4);
+	sq_pushinteger(v, static_cast<SQInteger>(t4));
 	return 1;
 }
 
 static SQInteger _g_blob_swapfloat(HSQUIRRELVM v) {
 	SQFloat f;
 	sq_getfloat(v, 2, &f);
-	__swap_dword((unsigned int *)&f);
+	__swap_dword(reinterpret_cast<unsigned int *>(&f));
 	sq_pushfloat(v, f);
 	return 1;
 }

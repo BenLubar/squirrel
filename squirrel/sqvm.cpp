@@ -43,7 +43,7 @@ bool SQVM::BW_OP(SQUnsignedInteger op, SQObjectPtr &trg, const SQObjectPtr &o1, 
 				res = i1 >> i2;
 				break;
 			case BW_USHIFTR:
-				res = (SQInteger)(*((SQUnsignedInteger *)&i1) >> i2);
+				res = static_cast<SQInteger>(*(reinterpret_cast<SQUnsignedInteger *>(&i1)) >> i2);
 				break;
 			default: {
 				Raise_Error(_SC("internal vm error bitwise op failed"));
@@ -158,7 +158,7 @@ bool SQVM::ARITH_OP(SQUnsignedInteger op, SQObjectPtr &trg, const SQObjectPtr &o
 					res = f1 * f2;
 					break;
 				case '%':
-					res = SQFloat(fmod((double)f1, (double)f2));
+					res = static_cast<SQFloat>(fmod(static_cast<double>(f1), static_cast<double>(f2)));
 					break;
 				default:
 					res = 0x0f;
@@ -518,7 +518,7 @@ bool SQVM::StartCall(SQClosure *closure, SQInteger target, SQInteger args, SQInt
 		paramssize--;
 		if (nargs < paramssize) {
 			Raise_Error(_SC("wrong number of parameters (%d passed, at least %d required)"),
-					(int)nargs, (int)paramssize);
+					static_cast<int>(nargs), static_cast<int>(paramssize));
 			return false;
 		}
 
@@ -542,7 +542,7 @@ bool SQVM::StartCall(SQClosure *closure, SQInteger target, SQInteger args, SQInt
 			}
 		} else {
 			Raise_Error(_SC("wrong number of parameters (%d passed, %d required)"),
-					(int)nargs, (int)paramssize);
+					static_cast<int>(nargs), static_cast<int>(paramssize));
 			return false;
 		}
 	}
@@ -558,7 +558,7 @@ bool SQVM::StartCall(SQClosure *closure, SQInteger target, SQInteger args, SQInt
 	ci->_closure = closure;
 	ci->_literals = func->_literals;
 	ci->_ip = func->_instructions;
-	ci->_target = (SQInt32)target;
+	ci->_target = static_cast<SQInt32>(target);
 
 	if (_debughook) {
 		CallDebugHook(_SC('c'));
@@ -669,25 +669,25 @@ bool SQVM::FOREACH_OP(SQObjectPtr &o1, SQObjectPtr &o2, SQObjectPtr &o3, SQObjec
 			if ((nrefidx = _table(o1)->Next(false, o4, o2, o3)) == -1) {
 				_FINISH(exitpos);
 			}
-			o4 = (SQInteger)nrefidx;
+			o4 = nrefidx;
 			_FINISH(1);
 		case OT_ARRAY:
 			if ((nrefidx = _array(o1)->Next(o4, o2, o3)) == -1) {
 				_FINISH(exitpos);
 			}
-			o4 = (SQInteger)nrefidx;
+			o4 = nrefidx;
 			_FINISH(1);
 		case OT_STRING:
 			if ((nrefidx = _string(o1)->Next(o4, o2, o3)) == -1) {
 				_FINISH(exitpos);
 			}
-			o4 = (SQInteger)nrefidx;
+			o4 = nrefidx;
 			_FINISH(1);
 		case OT_CLASS:
 			if ((nrefidx = _class(o1)->Next(o4, o2, o3)) == -1) {
 				_FINISH(exitpos);
 			}
-			o4 = (SQInteger)nrefidx;
+			o4 = nrefidx;
 			_FINISH(1);
 		case OT_USERDATA:
 		case OT_INSTANCE:
@@ -837,7 +837,7 @@ bool SQVM::IsEqual(const SQObjectPtr &o1, const SQObjectPtr &o2, bool &res) {
 }
 
 bool SQVM::IsFalse(SQObjectPtr &o) {
-	if ((((sq_type(o) & SQOBJECT_CANBEFALSE) != 0) && (((sq_type(o) == OT_FLOAT) && (_float(o) == SQFloat(0.0)))))
+	if ((((sq_type(o) & SQOBJECT_CANBEFALSE) != 0) && (((sq_type(o) == OT_FLOAT) && (_float(o) == static_cast<SQFloat>(0.0)))))
 #if !defined(SQUSEDOUBLE) || (defined(SQUSEDOUBLE) && defined(_SQ64))
 			|| (_integer(o) == 0)) //OT_NULL|OT_INTEGER|OT_BOOL
 #else
@@ -914,11 +914,11 @@ exception_restore:
 					TARGET = (SQInteger)arg1;
 					continue;
 #else
-					TARGET = (SQInteger)((SQInt32)arg1);
+					TARGET = static_cast<SQInteger>(arg1);
 					continue;
 #endif
 				case _OP_LOADFLOAT:
-					TARGET = *((const SQFloat *)&arg1);
+					TARGET = *(reinterpret_cast<const SQFloat *>(&arg1));
 					continue;
 				case _OP_DLOAD:
 					TARGET = ci->_literals[arg1];
@@ -1179,12 +1179,12 @@ exception_restore:
 #ifndef _SQ64
 							val._unVal.nInteger = (SQInteger)arg1;
 #else
-							val._unVal.nInteger = (SQInteger)((SQInt32)arg1);
+							val._unVal.nInteger = static_cast<SQInteger>(arg1);
 #endif
 							break;
 						case AAT_FLOAT:
 							val._type = OT_FLOAT;
-							val._unVal.fFloat = *((const SQFloat *)&arg1);
+							val._unVal.fFloat = *(reinterpret_cast<const SQFloat *>(&arg1));
 							break;
 						case AAT_BOOL:
 							val._type = OT_BOOL;
@@ -1199,7 +1199,7 @@ exception_restore:
 					continue;
 				}
 				case _OP_COMPARITH: {
-					SQInteger selfidx = (((SQUnsignedInteger)arg1 & 0xFFFF0000) >> 16);
+					SQInteger selfidx = ((static_cast<SQUnsignedInteger> arg1 & 0xFFFF0000) >> 16);
 					_GUARD(DerefInc(arg3, TARGET, STK(selfidx), STK(arg2), STK(arg1 & 0x0000FFFF), false, selfidx));
 				}
 					continue;
@@ -1268,7 +1268,7 @@ exception_restore:
 				case _OP_BWNOT:
 					if (sq_type(STK(arg1)) == OT_INTEGER) {
 						SQInteger t = _integer(STK(arg1));
-						TARGET = SQInteger(~t);
+						TARGET = (~t);
 						continue;
 					}
 					Raise_Error(_SC("attempt to perform a bitwise op on a %s"), GetTypeName(STK(arg1)));
@@ -1579,7 +1579,7 @@ bool SQVM::Get(const SQObjectPtr &self, const SQObjectPtr &key, SQObjectPtr &des
 					n += len;
 				}
 				if (n >= 0 && n < len) {
-					dest = SQInteger(_stringval(self)[n]);
+					dest = static_cast<SQInteger>(_stringval(self)[n]);
 					return true;
 				}
 				if ((getflags & GET_FLAG_DO_NOT_RAISE_ERROR) == 0) {
@@ -1608,7 +1608,7 @@ bool SQVM::Get(const SQObjectPtr &self, const SQObjectPtr &key, SQObjectPtr &des
 	if (selfidx == 0) {
 		SQWeakRef *w = _closure(ci->_closure)->_root;
 		if (sq_type(w->_obj) != OT_NULL) {
-			if (Get(*((const SQObjectPtr *)&w->_obj), key, dest, 0, DONT_FALL_BACK)) {
+			if (Get(*(static_cast<const SQObjectPtr *>(&w->_obj)), key, dest, 0, DONT_FALL_BACK)) {
 				return true;
 			}
 		}
@@ -2018,8 +2018,8 @@ bool SQVM::EnterFrame(SQInteger newbase, SQInteger newtop, bool tailcall) {
 			GrowCallStack();
 		}
 		ci = &_callsstack[_callsstacksize++];
-		ci->_prevstkbase = (SQInt32)(newbase - _stackbase);
-		ci->_prevtop = (SQInt32)(_top - _stackbase);
+		ci->_prevstkbase = static_cast<SQInt32>(newbase - _stackbase);
+		ci->_prevtop = static_cast<SQInt32>(_top - _stackbase);
 		ci->_etraps = 0;
 		ci->_ncalls = 1;
 		ci->_generator = nullptr;
@@ -2030,7 +2030,7 @@ bool SQVM::EnterFrame(SQInteger newbase, SQInteger newtop, bool tailcall) {
 
 	_stackbase = newbase;
 	_top = newtop;
-	if (newtop + MIN_STACK_OVERHEAD > (SQInteger)_stack.size()) {
+	if (newtop + MIN_STACK_OVERHEAD > static_cast<SQInteger>(_stack.size())) {
 		//if(_nmetamethodscall) {
 		//    Raise_Error(_SC("stack overflow, cannot resize stack while in a metamethod"));
 		//    return false;

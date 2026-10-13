@@ -106,7 +106,7 @@ void SQLexer::Next() {
 		Error(_SC("Invalid character"));
 	}
 	if (t != 0) {
-		_currdata = (LexChar)t;
+		_currdata = static_cast<LexChar>(t);
 		return;
 	}
 	_currdata = SQUIRREL_EOB;
@@ -119,8 +119,8 @@ const SQChar *SQLexer::Tok2Str(SQInteger tok) {
 	SQObjectPtr val;
 	SQInteger nitr;
 	while ((nitr = _keywords->Next(false, itr, key, val)) != -1) {
-		itr = (SQInteger)nitr;
-		if (((SQInteger)_integer(val)) == tok) {
+		itr = nitr;
+		if ((_integer(val)) == tok) {
 			return _stringval(key);
 		}
 	}
@@ -370,7 +370,7 @@ SQInteger SQLexer::Lex() {
 					RETURN_TOKEN(t);
 				} else {
 					SQInteger c = CUR_CHAR;
-					if (sciscntrl((int)c)) {
+					if (sciscntrl(static_cast<int>(c))) {
 						Error(_SC("unexpected character(control)"));
 					}
 					NEXT();
@@ -386,7 +386,7 @@ SQInteger SQLexer::Lex() {
 SQInteger SQLexer::GetIDType(const SQChar *s, SQInteger len) {
 	SQObjectPtr t;
 	if (_keywords->GetStr(s, len, t)) {
-		return SQInteger(_integer(t));
+		return (_integer(t));
 	}
 	return TK_IDENTIFIER;
 }
@@ -680,16 +680,16 @@ SQInteger SQLexer::ReadNumber() {
 	switch (type) {
 		case TSCIENTIFIC:
 		case TFLOAT:
-			_fvalue = (SQFloat)scstrtod(&_longstr[0], &sTemp);
+			_fvalue = static_cast<SQFloat>(scstrtod(&_longstr[0], &sTemp));
 			return TK_FLOAT;
 		case TINT:
-			LexInteger(&_longstr[0], (SQUnsignedInteger *)&_nvalue);
+			LexInteger(&_longstr[0], reinterpret_cast<SQUnsignedInteger *>(&_nvalue));
 			return TK_INTEGER;
 		case THEX:
-			LexHexadecimal(&_longstr[0], (SQUnsignedInteger *)&_nvalue);
+			LexHexadecimal(&_longstr[0], reinterpret_cast<SQUnsignedInteger *>(&_nvalue));
 			return TK_INTEGER;
 		case TOCTAL:
-			LexOctal(&_longstr[0], (SQUnsignedInteger *)&_nvalue);
+			LexOctal(&_longstr[0], reinterpret_cast<SQUnsignedInteger *>(&_nvalue));
 			return TK_INTEGER;
 	}
 	return 0;

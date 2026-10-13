@@ -71,10 +71,10 @@ void SQString::Release() {
 }
 
 SQInteger SQString::Next(const SQObjectPtr &refpos, SQObjectPtr &outkey, SQObjectPtr &outval) {
-	SQInteger idx = (SQInteger)TranslateIndex(refpos);
+	SQInteger idx = static_cast<SQInteger>(TranslateIndex(refpos));
 	while (idx < _len) {
-		outkey = (SQInteger)idx;
-		outval = (SQInteger)((SQUnsignedInteger)_val[idx]);
+		outkey = idx;
+		outval = static_cast<SQInteger>(static_cast<SQUnsignedInteger>(_val[idx]));
 		//return idx for the next iteration
 		return ++idx;
 	}
@@ -87,7 +87,7 @@ SQUnsignedInteger TranslateIndex(const SQObjectPtr &idx) {
 		case OT_NULL:
 			return 0;
 		case OT_INTEGER:
-			return (SQUnsignedInteger)_integer(idx);
+			return static_cast<SQUnsignedInteger> _integer(idx);
 		default:
 			assert(0);
 			break;
@@ -199,7 +199,7 @@ bool SQGenerator::Resume(SQVM *v, SQObjectPtr &dest) {
 		return false;
 	}
 	v->ci->_generator = this;
-	v->ci->_target = (SQInt32)target;
+	v->ci->_target = static_cast<SQInt32>(target);
 	v->ci->_closure = _ci._closure;
 	v->ci->_ip = _ci._ip;
 	v->ci->_literals = _ci._literals;
@@ -259,7 +259,7 @@ const SQChar *SQFunctionProto::GetLocal(SQVM *vm, SQUnsignedInteger stackbase, S
 }
 
 SQInteger SQFunctionProto::GetLine(SQInstruction *curr) {
-	SQInteger op = (SQInteger)(curr - _instructions);
+	SQInteger op = static_cast<SQInteger>(curr - _instructions);
 	SQInteger line = _lineinfos[0]._line;
 	SQInteger low = 0;
 	SQInteger high = _nlineinfos - 1;
@@ -331,7 +331,7 @@ bool CheckTag(HSQUIRRELVM v, SQREADFUNC read, SQUserPointer up, SQUnsignedIntege
 }
 
 bool WriteObject(HSQUIRRELVM v, SQUserPointer up, SQWRITEFUNC write, SQObjectPtr &o) {
-	SQUnsignedInteger32 _type = (SQUnsignedInteger32)sq_type(o);
+	SQUnsignedInteger32 _type = static_cast<SQUnsignedInteger32> sq_type(o);
 	_CHECK_IO(SafeWrite(v, write, up, &_type, sizeof(_type)));
 	switch (sq_type(o)) {
 		case OT_STRING:
@@ -357,7 +357,7 @@ bool WriteObject(HSQUIRRELVM v, SQUserPointer up, SQWRITEFUNC write, SQObjectPtr
 bool ReadObject(HSQUIRRELVM v, SQUserPointer up, SQREADFUNC read, SQObjectPtr &o) {
 	SQUnsignedInteger32 _type;
 	_CHECK_IO(SafeRead(v, read, up, &_type, sizeof(_type)));
-	SQObjectType t = (SQObjectType)_type;
+	SQObjectType t = static_cast<SQObjectType>(_type);
 	switch (t) {
 		case OT_STRING: {
 			SQInteger len;
@@ -548,7 +548,7 @@ bool SQFunctionProto::Load(SQVM *v, SQUserPointer up, SQREADFUNC read, SQObjectP
 		_CHECK_IO(SafeRead(v, read, up, &type, sizeof(SQUnsignedInteger)));
 		_CHECK_IO(ReadObject(v, up, read, o));
 		_CHECK_IO(ReadObject(v, up, read, name));
-		f->_outervalues[i] = SQOuterVar(name, o, (SQOuterType)type);
+		f->_outervalues[i] = SQOuterVar(name, o, static_cast<SQOuterType>(type));
 	}
 	_CHECK_IO(CheckTag(v, read, up, SQ_CLOSURESTREAM_PART));
 

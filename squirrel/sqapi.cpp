@@ -48,7 +48,7 @@ HSQUIRRELVM sq_open(SQInteger initialstacksize) {
 	SQVM *v;
 	sq_new(ss, SQSharedState);
 	ss->Init();
-	v = (SQVM *)SQ_MALLOC(sizeof(SQVM));
+	v = static_cast<SQVM *>(SQ_MALLOC(sizeof(SQVM)));
 	new (v) SQVM(ss);
 	ss->_root_vm = v;
 	if (v->Init(nullptr, initialstacksize)) {
@@ -65,7 +65,7 @@ HSQUIRRELVM sq_newthread(HSQUIRRELVM friendvm, SQInteger initialstacksize) {
 	SQVM *v;
 	ss = _ss(friendvm);
 
-	v = (SQVM *)SQ_MALLOC(sizeof(SQVM));
+	v = static_cast<SQVM *>(SQ_MALLOC(sizeof(SQVM)));
 	new (v) SQVM(ss);
 
 	if (v->Init(friendvm, initialstacksize)) {
@@ -391,7 +391,7 @@ SQRESULT sq_getclosureinfo(HSQUIRRELVM v, SQInteger idx, SQInteger *nparamsmin, 
 		SQNativeClosure *c = _nativeclosure(o);
 		*nparamsmin = c->_nparamscheckmin;
 		*nparamsmax = c->_nparamscheckmax;
-		*nfreevars = (SQInteger)c->_noutervalues;
+		*nfreevars = static_cast<SQInteger>(c->_noutervalues);
 		return SQ_OK;
 	}
 	return sq_throwerror(v, _SC("the object is not a closure"));
@@ -1125,12 +1125,12 @@ const SQChar *sq_getlocal(HSQUIRRELVM v, SQUnsignedInteger level, SQUnsignedInte
 		}
 		SQClosure *c = _closure(ci._closure);
 		SQFunctionProto *func = c->_function;
-		if (func->_noutervalues > (SQInteger)idx) {
+		if (func->_noutervalues > static_cast<SQInteger>(idx)) {
 			v->Push(*_outer(c->_outervalues[idx])->_valptr);
 			return _stringval(func->_outervalues[idx]._name);
 		}
 		idx -= func->_noutervalues;
-		return func->GetLocal(v, stackbase, idx, (SQInteger)(ci._ip - func->_instructions) - 1);
+		return func->GetLocal(v, stackbase, idx, static_cast<SQInteger>(ci._ip - func->_instructions) - 1);
 	}
 	return nullptr;
 }
@@ -1164,7 +1164,7 @@ void sq_getlasterror(HSQUIRRELVM v) {
 }
 
 SQRESULT sq_reservestack(HSQUIRRELVM v, SQInteger nsize) {
-	if (((SQUnsignedInteger)v->_top + nsize) > v->_stack.size()) {
+	if ((static_cast<SQUnsignedInteger>(v->_top) + nsize) > v->_stack.size()) {
 		if (v->_nmetamethodscall != 0) {
 			return sq_throwerror(v, _SC("cannot resize stack while in a metamethod"));
 		}
@@ -1355,7 +1355,7 @@ const SQChar *sq_getfreevariable(HSQUIRRELVM v, SQInteger idx, SQUnsignedInteger
 		case OT_CLOSURE: {
 			SQClosure *clo = _closure(self);
 			SQFunctionProto *fp = clo->_function;
-			if (((SQUnsignedInteger)fp->_noutervalues) > nval) {
+			if ((static_cast<SQUnsignedInteger>(fp->_noutervalues)) > nval) {
 				v->Push(*(_outer(clo->_outervalues[nval])->_valptr));
 				SQOuterVar &ov = fp->_outervalues[nval];
 				name = _stringval(ov._name);
@@ -1379,7 +1379,7 @@ SQRESULT sq_setfreevariable(HSQUIRRELVM v, SQInteger idx, SQUnsignedInteger nval
 	switch (sq_type(self)) {
 		case OT_CLOSURE: {
 			SQFunctionProto *fp = _closure(self)->_function;
-			if (((SQUnsignedInteger)fp->_noutervalues) > nval) {
+			if ((static_cast<SQUnsignedInteger>(fp->_noutervalues)) > nval) {
 				*(_outer(_closure(self)->_outervalues[nval])->_valptr) = stack_get(v, -1);
 			} else {
 				return sq_throwerror(v, _SC("invalid free var index"));
@@ -1611,7 +1611,7 @@ struct BufState {
 };
 
 SQInteger buf_lexfeed(SQUserPointer file) {
-	BufState *buf = (BufState *)file;
+	BufState *buf = static_cast<BufState *>(file);
 	if (buf->size < (buf->ptr + 1)) {
 		return 0;
 	}

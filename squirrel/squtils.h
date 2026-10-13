@@ -22,9 +22,9 @@ void sq_vm_free(void *p, SQUnsignedInteger size);
 		__ptr->~__type(); \
 		sq_vm_free(__ptr, sizeof(__type)); \
 	}
-#define SQ_MALLOC(__size) sq_vm_malloc((__size));
-#define SQ_FREE(__ptr, __size) sq_vm_free((__ptr), (__size));
-#define SQ_REALLOC(__ptr, __oldsize, __size) sq_vm_realloc((__ptr), (__oldsize), (__size));
+#define SQ_MALLOC(__size) sq_vm_malloc((__size))
+#define SQ_FREE(__ptr, __size) sq_vm_free((__ptr), (__size))
+#define SQ_REALLOC(__ptr, __oldsize, __size) sq_vm_realloc((__ptr), (__oldsize), (__size))
 
 #define sq_aligning(v) (((size_t)(v) + (SQ_ALIGNMENT - 1)) & (~(SQ_ALIGNMENT - 1)))
 #define sq_max(a, b) ((a) > (b) ? (a) : (b))

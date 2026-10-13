@@ -61,7 +61,7 @@ SQRESULT sq_stackinfos(HSQUIRRELVM v, SQInteger level, SQStackInfos *si) {
 void SQVM::Raise_Error(const SQChar *s, ...) {
 	va_list vl;
 	va_start(vl, s);
-	SQInteger buffersize = (SQInteger)scstrlen(s) + (NUMBER_MAX_CHAR * 2);
+	SQInteger buffersize = static_cast<SQInteger>(scstrlen(s)) + (NUMBER_MAX_CHAR * 2);
 	scvsprintf(_sp(sq_rsl(buffersize)), buffersize, s, vl);
 	va_end(vl);
 	_lasterror = SQString::Create(_ss(this), _spval, -1);
@@ -103,14 +103,14 @@ void SQVM::Raise_ParamTypeError(SQInteger nparam, SQInteger typemask, SQInteger 
 	SQObjectPtr exptypes = SQString::Create(_ss(this), _SC(""), -1);
 	SQInteger found = 0;
 	for (SQInteger i = 0; i < 16; i++) {
-		SQInteger mask = ((SQInteger)1) << i;
+		SQInteger mask = (static_cast<SQInteger>(1)) << i;
 		if ((typemask & (mask)) != 0) {
 			if (found > 0) {
 				StringCat(exptypes, SQString::Create(_ss(this), _SC("|"), -1), exptypes);
 			}
 			found++;
-			StringCat(exptypes, SQString::Create(_ss(this), IdType2Name((SQObjectType)mask), -1), exptypes);
+			StringCat(exptypes, SQString::Create(_ss(this), IdType2Name(static_cast<SQObjectType>(mask)), -1), exptypes);
 		}
 	}
-	Raise_Error(_SC("parameter %d has an invalid type '%s' ; expected: '%s'"), nparam, IdType2Name((SQObjectType)type), _stringval(exptypes));
+	Raise_Error(_SC("parameter %d has an invalid type '%s' ; expected: '%s'"), nparam, IdType2Name(static_cast<SQObjectType>(type)), _stringval(exptypes));
 }

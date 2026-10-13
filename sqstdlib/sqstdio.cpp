@@ -11,19 +11,19 @@
 //basic API
 SQFILE sqstd_fopen(const SQChar *filename, const SQChar *mode) {
 #ifndef SQUNICODE
-	return (SQFILE)fopen(filename, mode);
+	return reinterpret_cast<SQFILE>(fopen(filename, mode));
 #else
 	return (SQFILE)_wfopen(filename, mode);
 #endif
 }
 
 SQInteger sqstd_fread(void *buffer, SQInteger size, SQInteger count, SQFILE file) {
-	SQInteger ret = (SQInteger)fread(buffer, size, count, (FILE *)file);
+	SQInteger ret = static_cast<SQInteger>(fread(buffer, size, count, static_cast<FILE *>(file)));
 	return ret;
 }
 
 SQInteger sqstd_fwrite(const SQUserPointer buffer, SQInteger size, SQInteger count, SQFILE file) {
-	return (SQInteger)fwrite(buffer, size, count, (FILE *)file);
+	return static_cast<SQInteger>(fwrite(buffer, size, count, static_cast<FILE *>(file)));
 }
 
 SQInteger sqstd_fseek(SQFILE file, SQInteger offset, SQInteger origin) {
@@ -41,23 +41,23 @@ SQInteger sqstd_fseek(SQFILE file, SQInteger offset, SQInteger origin) {
 		default:
 			return -1; //failed
 	}
-	return fseek((FILE *)file, (long)offset, (int)realorigin);
+	return fseek(static_cast<FILE *>(file), static_cast<long>(offset), static_cast<int>(realorigin));
 }
 
 SQInteger sqstd_ftell(SQFILE file) {
-	return ftell((FILE *)file);
+	return ftell(static_cast<FILE *>(file));
 }
 
 SQInteger sqstd_fflush(SQFILE file) {
-	return fflush((FILE *)file);
+	return fflush(static_cast<FILE *>(file));
 }
 
 SQInteger sqstd_fclose(SQFILE file) {
-	return fclose((FILE *)file);
+	return fclose(static_cast<FILE *>(file));
 }
 
 SQInteger sqstd_feof(SQFILE file) {
-	return feof((FILE *)file);
+	return feof(static_cast<FILE *>(file));
 }
 
 //File
@@ -123,7 +123,7 @@ static SQInteger _file__typeof(HSQUIRRELVM v) {
 }
 
 static SQInteger _file_releasehook(SQUserPointer p, SQInteger SQ_UNUSED_ARG(size)) {
-	SQFile *self = (SQFile *)p;
+	SQFile *self = static_cast<SQFile *>(p);
 	self->~SQFile();
 	sq_free(self, sizeof(SQFile));
 	return 1;
@@ -236,7 +236,7 @@ SQInteger _read_two_bytes(IOBuffer *iobuffer) {
 		if (iobuffer->size < 2) {
 			return 0;
 		}
-		SQInteger ret = *((const wchar_t *)&iobuffer->buffer[iobuffer->ptr]);
+		SQInteger ret = *(reinterpret_cast<const wchar_t *>(&iobuffer->buffer[iobuffer->ptr]));
 		iobuffer->ptr += 2;
 		return ret;
 	} else {
@@ -244,7 +244,7 @@ SQInteger _read_two_bytes(IOBuffer *iobuffer) {
 			if (iobuffer->size < 2) {
 				return 0;
 			}
-			SQInteger ret = *((const wchar_t *)&iobuffer->buffer[0]);
+			SQInteger ret = *(reinterpret_cast<const wchar_t *>(&iobuffer->buffer[0]));
 			iobuffer->ptr = 2;
 			return ret;
 		}
@@ -254,7 +254,7 @@ SQInteger _read_two_bytes(IOBuffer *iobuffer) {
 }
 
 static SQInteger _io_file_lexfeed_PLAIN(SQUserPointer iobuf) {
-	IOBuffer *iobuffer = (IOBuffer *)iobuf;
+	IOBuffer *iobuffer = static_cast<IOBuffer *>(iobuf);
 	return _read_byte(iobuffer);
 }
 
@@ -299,7 +299,7 @@ static SQInteger _io_file_lexfeed_UTF8(SQUserPointer iobuf) {
 
 static SQInteger _io_file_lexfeed_UCS2_LE(SQUserPointer iobuf) {
 	SQInteger ret;
-	IOBuffer *iobuffer = (IOBuffer *)iobuf;
+	IOBuffer *iobuffer = static_cast<IOBuffer *>(iobuf);
 	if ((ret = _read_two_bytes(iobuffer)) > 0) {
 		return ret;
 	}
@@ -308,7 +308,7 @@ static SQInteger _io_file_lexfeed_UCS2_LE(SQUserPointer iobuf) {
 
 static SQInteger _io_file_lexfeed_UCS2_BE(SQUserPointer iobuf) {
 	SQInteger c;
-	IOBuffer *iobuffer = (IOBuffer *)iobuf;
+	IOBuffer *iobuffer = static_cast<IOBuffer *>(iobuf);
 	if ((c = _read_two_bytes(iobuffer)) > 0) {
 		c = ((c >> 8) & 0x00FF) | ((c << 8) & 0xFF00);
 		return c;
@@ -318,14 +318,14 @@ static SQInteger _io_file_lexfeed_UCS2_BE(SQUserPointer iobuf) {
 
 SQInteger file_read(SQUserPointer file, SQUserPointer buf, SQInteger size) {
 	SQInteger ret;
-	if ((ret = sqstd_fread(buf, 1, size, (SQFILE)file)) != 0) {
+	if ((ret = sqstd_fread(buf, 1, size, static_cast<SQFILE>(file))) != 0) {
 		return ret;
 	}
 	return -1;
 }
 
 SQInteger file_write(SQUserPointer file, SQUserPointer p, SQInteger size) {
-	return sqstd_fwrite(p, 1, size, (SQFILE)file);
+	return sqstd_fwrite(p, 1, size, static_cast<SQFILE>(file));
 }
 
 SQRESULT sqstd_loadfile(HSQUIRRELVM v, const SQChar *filename, SQBool printerror) {

@@ -77,7 +77,7 @@ bool SQClass::NewSlot(SQSharedState *ss, const SQObjectPtr &key, const SQObjectP
 				bool isconstructor;
 				SQVM::IsEqual(ss->_constructoridx, key, isconstructor);
 				if (isconstructor) {
-					_constructoridx = (SQInteger)_methods.size();
+					_constructoridx = static_cast<SQInteger>(_methods.size());
 				}
 				SQClassMember m;
 				m.val = theval;

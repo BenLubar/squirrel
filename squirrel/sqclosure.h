@@ -24,9 +24,9 @@ private:
 public:
 	static SQClosure *Create(SQSharedState *ss, SQFunctionProto *func, SQWeakRef *root) {
 		SQInteger size = _CALC_CLOSURE_SIZE(func);
-		SQClosure *nc = (SQClosure *)SQ_MALLOC(size);
+		SQClosure *nc = static_cast<SQClosure *>(SQ_MALLOC(size));
 		new (nc) SQClosure(ss, func);
-		nc->_outervalues = (SQObjectPtr *)(nc + 1);
+		nc->_outervalues = reinterpret_cast<SQObjectPtr *>(nc + 1);
 		nc->_defaultparams = &nc->_outervalues[func->_noutervalues];
 		nc->_root = root;
 		__ObjAddRef(nc->_root);
@@ -92,7 +92,7 @@ private:
 
 public:
 	static SQOuter *Create(SQSharedState *ss, SQObjectPtr *outer) {
-		SQOuter *nc = (SQOuter *)SQ_MALLOC(sizeof(SQOuter));
+		SQOuter *nc = static_cast<SQOuter *>(SQ_MALLOC(sizeof(SQOuter)));
 		new (nc) SQOuter(ss, outer);
 		return nc;
 	}
@@ -132,7 +132,7 @@ private:
 
 public:
 	static SQGenerator *Create(SQSharedState *ss, SQClosure *closure) {
-		SQGenerator *nc = (SQGenerator *)SQ_MALLOC(sizeof(SQGenerator));
+		SQGenerator *nc = static_cast<SQGenerator *>(SQ_MALLOC(sizeof(SQGenerator)));
 		new (nc) SQGenerator(ss, closure);
 		return nc;
 	}
@@ -179,9 +179,9 @@ private:
 public:
 	static SQNativeClosure *Create(SQSharedState *ss, SQFUNCTION func, SQInteger nouters) {
 		SQInteger size = _CALC_NATVIVECLOSURE_SIZE(nouters);
-		SQNativeClosure *nc = (SQNativeClosure *)SQ_MALLOC(size);
+		SQNativeClosure *nc = static_cast<SQNativeClosure *>(SQ_MALLOC(size));
 		new (nc) SQNativeClosure(ss, func);
-		nc->_outervalues = (SQObjectPtr *)(nc + 1);
+		nc->_outervalues = reinterpret_cast<SQObjectPtr *>(nc + 1);
 		nc->_noutervalues = nouters;
 		_CONSTRUCT_VECTOR(SQObjectPtr, nc->_noutervalues, nc->_outervalues);
 		return nc;

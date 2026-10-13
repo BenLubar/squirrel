@@ -239,26 +239,26 @@ SQInteger SQFuncState::GetConstant(const SQObject &cons) {
 }
 
 void SQFuncState::SetInstructionParams(SQInteger pos, SQInteger arg0, SQInteger arg1, SQInteger arg2, SQInteger arg3) {
-	_instructions[pos]._arg0 = (unsigned char)*((SQUnsignedInteger *)&arg0);
-	_instructions[pos]._arg1 = (SQInt32) * ((SQUnsignedInteger *)&arg1);
-	_instructions[pos]._arg2 = (unsigned char)*((SQUnsignedInteger *)&arg2);
-	_instructions[pos]._arg3 = (unsigned char)*((SQUnsignedInteger *)&arg3);
+	_instructions[pos]._arg0 = static_cast<unsigned char>(*(reinterpret_cast<SQUnsignedInteger *>(&arg0)));
+	_instructions[pos]._arg1 = static_cast<SQInt32>(*(reinterpret_cast<SQUnsignedInteger *>(&arg1)));
+	_instructions[pos]._arg2 = static_cast<unsigned char>(*(reinterpret_cast<SQUnsignedInteger *>(&arg2)));
+	_instructions[pos]._arg3 = static_cast<unsigned char>(*(reinterpret_cast<SQUnsignedInteger *>(&arg3)));
 }
 
 void SQFuncState::SetInstructionParam(SQInteger pos, SQInteger arg, SQInteger val) {
 	switch (arg) {
 		case 0:
-			_instructions[pos]._arg0 = (unsigned char)*((SQUnsignedInteger *)&val);
+			_instructions[pos]._arg0 = static_cast<unsigned char>(*(reinterpret_cast<SQUnsignedInteger *>(&val)));
 			break;
 		case 1:
 		case 4:
-			_instructions[pos]._arg1 = (SQInt32) * ((SQUnsignedInteger *)&val);
+			_instructions[pos]._arg1 = static_cast<SQInt32>(*(reinterpret_cast<SQUnsignedInteger *>(&val)));
 			break;
 		case 2:
-			_instructions[pos]._arg2 = (unsigned char)*((SQUnsignedInteger *)&val);
+			_instructions[pos]._arg2 = static_cast<unsigned char>(*(reinterpret_cast<SQUnsignedInteger *>(&val)));
 			break;
 		case 3:
-			_instructions[pos]._arg3 = (unsigned char)*((SQUnsignedInteger *)&val);
+			_instructions[pos]._arg3 = static_cast<unsigned char>(*(reinterpret_cast<SQUnsignedInteger *>(&val)));
 			break;
 	};
 }
@@ -266,7 +266,7 @@ void SQFuncState::SetInstructionParam(SQInteger pos, SQInteger arg, SQInteger va
 SQInteger SQFuncState::AllocStackPos() {
 	SQInteger npos = _vlocals.size();
 	_vlocals.push_back(SQLocalVarInfo());
-	if (_vlocals.size() > ((SQUnsignedInteger)_stacksize)) {
+	if (_vlocals.size() > (static_cast<SQUnsignedInteger>(_stacksize))) {
 		if (_stacksize > MAX_FUNC_STACKSIZE) {
 			Error(_SC("internal compiler error: too many locals"));
 		}
@@ -361,7 +361,7 @@ SQInteger SQFuncState::PushLocalVariable(const SQObject &name) {
 	lvi._start_op = GetCurrentPos() + 1;
 	lvi._pos = _vlocals.size();
 	_vlocals.push_back(lvi);
-	if (_vlocals.size() > ((SQUnsignedInteger)_stacksize)) {
+	if (_vlocals.size() > (static_cast<SQUnsignedInteger>(_stacksize))) {
 		_stacksize = _vlocals.size();
 	}
 	return pos;
@@ -398,12 +398,12 @@ SQInteger SQFuncState::GetOuterVariable(const SQObject &name) {
 		if (pos == -1) {
 			pos = _parent->GetOuterVariable(name);
 			if (pos != -1) {
-				_outervalues.push_back(SQOuterVar(name, SQObjectPtr(SQInteger(pos)), otOUTER)); //local
+				_outervalues.push_back(SQOuterVar(name, SQObjectPtr((pos)), otOUTER)); //local
 				return _outervalues.size() - 1;
 			}
 		} else {
 			_parent->MarkLocalAsOuter(pos);
-			_outervalues.push_back(SQOuterVar(name, SQObjectPtr(SQInteger(pos)), otLOCAL)); //local
+			_outervalues.push_back(SQOuterVar(name, SQObjectPtr((pos)), otLOCAL)); //local
 			return _outervalues.size() - 1;
 		}
 	}
@@ -455,7 +455,7 @@ void SQFuncState::AddInstruction(SQInstruction &i) {
 			case _OP_JZ:
 				if (pi.op == _OP_CMP && pi._arg1 < 0xFF) {
 					pi.op = _OP_JCMP;
-					pi._arg0 = (unsigned char)pi._arg1;
+					pi._arg0 = static_cast<unsigned char>(pi._arg1);
 					pi._arg1 = i._arg1;
 					return;
 				}
@@ -481,7 +481,7 @@ void SQFuncState::AddInstruction(SQInstruction &i) {
 				break;
 			case _OP_GET:
 				if (pi.op == _OP_LOAD && pi._arg0 == i._arg2 && (!IsLocal(pi._arg0))) {
-					pi._arg2 = (unsigned char)i._arg1;
+					pi._arg2 = static_cast<unsigned char>(i._arg1);
 					pi.op = _OP_GETK;
 					pi._arg0 = i._arg0;
 
@@ -518,7 +518,7 @@ void SQFuncState::AddInstruction(SQInstruction &i) {
 				if (aat != -1 && pi._arg0 == i._arg1 && (!IsLocal(pi._arg0))) {
 					pi.op = _OP_APPENDARRAY;
 					pi._arg0 = i._arg0;
-					pi._arg2 = (unsigned char)aat;
+					pi._arg2 = static_cast<unsigned char>(aat);
 					pi._arg3 = MAX_FUNC_STACKSIZE;
 					return;
 				}
@@ -548,7 +548,7 @@ void SQFuncState::AddInstruction(SQInstruction &i) {
 				if (pi.op == _OP_MOVE) {
 					pi.op = _OP_DMOVE;
 					pi._arg2 = i._arg0;
-					pi._arg3 = (unsigned char)i._arg1;
+					pi._arg3 = static_cast<unsigned char>(i._arg1);
 					return;
 				}
 				break;
@@ -556,7 +556,7 @@ void SQFuncState::AddInstruction(SQInstruction &i) {
 				if (pi.op == _OP_LOAD && i._arg1 < 256) {
 					pi.op = _OP_DLOAD;
 					pi._arg2 = i._arg0;
-					pi._arg3 = (unsigned char)i._arg1;
+					pi._arg3 = static_cast<unsigned char>(i._arg1);
 					return;
 				}
 				break;
@@ -591,13 +591,13 @@ void SQFuncState::AddInstruction(SQInstruction &i) {
 
 SQObject SQFuncState::CreateString(const SQChar *s, SQInteger len) {
 	SQObjectPtr ns(SQString::Create(_sharedstate, s, len));
-	_table(_strings)->NewSlot(ns, (SQInteger)1);
+	_table(_strings)->NewSlot(ns, static_cast<SQInteger>(1));
 	return ns;
 }
 
 SQObject SQFuncState::CreateTable() {
 	SQObjectPtr nt(SQTable::Create(_sharedstate, 0));
-	_table(_strings)->NewSlot(nt, (SQInteger)1);
+	_table(_strings)->NewSlot(nt, static_cast<SQInteger>(1));
 	return nt;
 }
 
@@ -648,7 +648,7 @@ SQFunctionProto *SQFuncState::BuildProto() {
 }
 
 SQFuncState *SQFuncState::PushChildState(SQSharedState *ss) {
-	SQFuncState *child = (SQFuncState *)sq_malloc(sizeof(SQFuncState));
+	SQFuncState *child = static_cast<SQFuncState *>(sq_malloc(sizeof(SQFuncState)));
 	new (child) SQFuncState(ss, this, _errfunc, _errtarget);
 	_childstates.push_back(child);
 	return child;
