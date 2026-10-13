@@ -6,15 +6,17 @@
 #include <crtdbg.h>
 #endif
 
+#include <assert.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+
 #include <new>
 //squirrel stuff
-#include <squirrel.h>
 #include "sqobject.h"
 #include "sqstate.h"
+
+#include <squirrel.h>
 
 #endif //_SQPCHEADER_H_
