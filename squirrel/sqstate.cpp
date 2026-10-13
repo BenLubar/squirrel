@@ -534,7 +534,7 @@ void RefTable::Resize(SQUnsignedInteger size) {
 	SQUnsignedInteger oldnumofslots = _numofslots;
 	AllocNodes(size);
 	//rehash
-	SQUnsignedInteger nfound = 0;
+	[[maybe_unused]] SQUnsignedInteger nfound = 0;
 	for (SQUnsignedInteger n = 0; n < oldnumofslots; n++) {
 		if (sq_type(t->obj) != OT_NULL) {
 			//add back;

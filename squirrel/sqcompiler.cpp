@@ -1132,7 +1132,7 @@ public:
 		_fs->AddInstruction(_OP_CALL, _fs->PushTarget(), closure, stackbase, nargs);
 		if (_token == '{') {
 			SQInteger retval = _fs->TopTarget();
-			SQInteger nkeys = 0;
+			[[maybe_unused]] SQInteger nkeys = 0;
 			Lex();
 			while (_token != '}') {
 				switch (_token) {
