@@ -7,6 +7,7 @@
 #include <sqstdio.h>
 #include <squirrel.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -26,9 +27,7 @@ SQInteger _stream_readblob(HSQUIRRELVM v) {
 	SQInteger size;
 	SQInteger res;
 	sq_getinteger(v, 2, &size);
-	if (size > self->Len()) {
-		size = self->Len();
-	}
+	size = std::min(size, self->Len());
 	data = sq_getscratchpad(v, size);
 	res = self->Read(data, size);
 	if (res <= 0) {

@@ -13,6 +13,7 @@
 #include "sqtable.h"
 #include "squserdata.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 
@@ -935,9 +936,7 @@ exception_restore:
 							STK(i) = STK(arg2 + i);
 						}
 						_GUARD(StartCall(_closure(clo), ci->_target, arg3, _stackbase, true));
-						if (last_top >= _top) {
-							_top = last_top;
-						}
+						_top = std::max(last_top, _top);
 						continue;
 					}
 				}
@@ -1536,9 +1535,7 @@ bool SQVM::TailCall(SQClosure *closure, SQInteger parambase, SQInteger nparams) 
 		STK(i) = STK(parambase + i);
 	}
 	bool ret = StartCall(closure, ci->_target, nparams, _stackbase, true);
-	if (last_top >= _top) {
-		_top = last_top;
-	}
+	_top = std::max(last_top, _top);
 	return ret;
 }
 

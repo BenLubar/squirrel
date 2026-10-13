@@ -8,6 +8,8 @@ see copyright notice in squirrel.h
 #include "sqpcheader.h"
 #include "sqvm.h"
 
+#include <algorithm>
+
 SQTable::SQTable(SQSharedState *ss, SQInteger nInitialSize) {
 	SQInteger pow2size = MINPOWER2;
 	while (nInitialSize > pow2size) {
@@ -70,9 +72,7 @@ void SQTable::AllocNodes(SQInteger nSize) {
 void SQTable::Rehash(bool force) {
 	SQInteger oldsize = _numofnodes;
 	//prevent problems with the integer division
-	if (oldsize < 4) {
-		oldsize = 4;
-	}
+	oldsize = std::max<SQInteger>(oldsize, 4);
 #ifdef KEEP_SLOT_ORDER
 	_HashNode *oldn = _firstinorder;
 #endif

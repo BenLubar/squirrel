@@ -3,6 +3,7 @@
 
 #include "sqstdio.h"
 
+#include <algorithm>
 #include <cstring>
 
 struct SQBlob : public SQStream {
@@ -53,12 +54,8 @@ struct SQBlob : public SQStream {
 			sq_free(_buf, _allocated);
 			_buf = newbuf;
 			_allocated = n;
-			if (_size > _allocated) {
-				_size = _allocated;
-			}
-			if (_ptr > _allocated) {
-				_ptr = _allocated;
-			}
+			_size = std::min(_size, _allocated);
+			_ptr = std::min(_ptr, _allocated);
 		}
 		return true;
 	}
