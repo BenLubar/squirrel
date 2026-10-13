@@ -57,7 +57,7 @@ static SQInteger _system_system(HSQUIRRELVM v) {
 }
 
 static SQInteger _system_clock(HSQUIRRELVM v) {
-	sq_pushfloat(v, (static_cast<SQFloat>(clock())) / static_cast<SQFloat> CLOCKS_PER_SEC);
+	sq_pushfloat(v, (static_cast<SQFloat>(clock())) / static_cast<SQFloat>(CLOCKS_PER_SEC));
 	return 1;
 }
 
