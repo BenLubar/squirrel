@@ -182,17 +182,17 @@ SQVM::SQVM(SQSharedState *ss) {
 	_suspended_target = -1;
 	_suspended_root = SQFalse;
 	_suspended_traps = -1;
-	_foreignptr = NULL;
+	_foreignptr = nullptr;
 	_nnativecalls = 0;
 	_nmetamethodscall = 0;
 	_lasterror.Null();
 	_errorhandler.Null();
 	_debughook = false;
-	_debughook_native = NULL;
+	_debughook_native = nullptr;
 	_debughook_closure.Null();
-	_openouters = NULL;
-	ci = NULL;
-	_releasehook = NULL;
+	_openouters = nullptr;
+	ci = nullptr;
+	_releasehook = nullptr;
 	INIT_CHAIN();
 	ADD_TO_CHAIN(&_ss(this)->_gc_chain, this);
 }
@@ -200,7 +200,7 @@ SQVM::SQVM(SQSharedState *ss) {
 void SQVM::Finalize() {
 	if (_releasehook) {
 		_releasehook(_foreignptr, 0);
-		_releasehook = NULL;
+		_releasehook = nullptr;
 	}
 	if (_openouters) {
 		CloseOuters(&_stack._vals[0]);
@@ -209,7 +209,7 @@ void SQVM::Finalize() {
 	_lasterror.Null();
 	_errorhandler.Null();
 	_debughook = false;
-	_debughook_native = NULL;
+	_debughook_native = nullptr;
 	_debughook_closure.Null();
 	temp_reg.Null();
 	_callstackdata.resize(0);
@@ -591,7 +591,7 @@ bool SQVM::Return(SQInteger _arg0, SQInteger _arg1, SQObjectPtr &retval) {
 	if (_isroot) {
 		dest = &(retval);
 	} else if (ci->_target == -1) {
-		dest = NULL;
+		dest = nullptr;
 	} else {
 		dest = &_stack._vals[callerbase + ci->_target];
 	}
@@ -788,7 +788,7 @@ bool SQVM::CLOSURE_OP(SQObjectPtr &target, SQFunctionProto *func, SQInteger boun
 }
 
 bool SQVM::CLASS_OP(SQObjectPtr &target, SQInteger baseclass, SQInteger attributes) {
-	SQClass *base = NULL;
+	SQClass *base = nullptr;
 	SQObjectPtr attrs;
 	if (baseclass != -1) {
 		if (sq_type(_stack._vals[_stackbase + baseclass]) != OT_CLASS) {
@@ -863,7 +863,7 @@ bool SQVM::Execute(SQObjectPtr &closure, SQInteger nargs, SQInteger stackbase, S
 			temp_reg = closure;
 			if (!StartCall(_closure(temp_reg), _top - nargs, nargs, stackbase, false)) {
 				//call the handler if there are no calls in the stack, if not relies on the previous node
-				if (ci == NULL) {
+				if (ci == nullptr) {
 					CallErrorHandler(_lasterror);
 				}
 				return false;
@@ -1442,8 +1442,8 @@ void SQVM::CallDebugHook(SQInteger type, SQInteger forcedline) {
 	_debughook = false;
 	SQFunctionProto *func = _closure(ci->_closure)->_function;
 	if (_debughook_native) {
-		const SQChar *src = sq_type(func->_sourcename) == OT_STRING ? _stringval(func->_sourcename) : NULL;
-		const SQChar *fname = sq_type(func->_name) == OT_STRING ? _stringval(func->_name) : NULL;
+		const SQChar *src = sq_type(func->_sourcename) == OT_STRING ? _stringval(func->_sourcename) : nullptr;
+		const SQChar *fname = sq_type(func->_name) == OT_STRING ? _stringval(func->_name) : nullptr;
 		SQInteger line = forcedline ? forcedline : func->GetLine(ci->_ip);
 		_debughook_native(this, type, src, line, fname);
 	} else {
@@ -1624,7 +1624,7 @@ bool SQVM::Get(const SQObjectPtr &self, const SQObjectPtr &key, SQObjectPtr &des
 }
 
 bool SQVM::InvokeDefaultDelegate(const SQObjectPtr &self, const SQObjectPtr &key, SQObjectPtr &dest) {
-	SQTable *ddel = NULL;
+	SQTable *ddel = nullptr;
 	switch (sq_type(self)) {
 		case OT_CLASS:
 			ddel = _class_ddel;
@@ -2000,7 +2000,7 @@ void SQVM::FindOuter(SQObjectPtr &target, SQObjectPtr *stackindex) {
 	SQOuter *p;
 	SQOuter *otr;
 
-	while ((p = *pp) != NULL && p->_valptr >= stackindex) {
+	while ((p = *pp) != nullptr && p->_valptr >= stackindex) {
 		if (p->_valptr == stackindex) {
 			target = SQObjectPtr(p);
 			return;
@@ -2025,7 +2025,7 @@ bool SQVM::EnterFrame(SQInteger newbase, SQInteger newtop, bool tailcall) {
 		ci->_prevtop = (SQInt32)(_top - _stackbase);
 		ci->_etraps = 0;
 		ci->_ncalls = 1;
-		ci->_generator = NULL;
+		ci->_generator = nullptr;
 		ci->_root = SQFalse;
 	} else {
 		ci->_ncalls++;
@@ -2053,7 +2053,7 @@ void SQVM::LeaveFrame() {
 	ci->_closure.Null();
 	_stackbase -= ci->_prevstkbase;
 	_top = _stackbase + ci->_prevtop;
-	ci = (css) ? &_callsstack[css - 1] : NULL;
+	ci = (css) ? &_callsstack[css - 1] : nullptr;
 
 	if (_openouters) {
 		CloseOuters(&(_stack._vals[last_stackbase]));
@@ -2073,7 +2073,7 @@ void SQVM::RelocateOuters() {
 
 void SQVM::CloseOuters(SQObjectPtr *stackindex) {
 	SQOuter *p;
-	while ((p = _openouters) != NULL && p->_valptr >= stackindex) {
+	while ((p = _openouters) != nullptr && p->_valptr >= stackindex) {
 		p->_value = *(p->_valptr);
 		p->_valptr = &p->_value;
 		_openouters = p->_next;

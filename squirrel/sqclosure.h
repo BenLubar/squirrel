@@ -14,11 +14,11 @@ private:
 	SQClosure(SQSharedState *ss, SQFunctionProto *func) {
 		_function = func;
 		__ObjAddRef(_function);
-		_base = NULL;
+		_base = nullptr;
 		INIT_CHAIN();
 		ADD_TO_CHAIN(&_ss(this)->_gc_chain, this);
-		_env = NULL;
-		_root = NULL;
+		_env = nullptr;
+		_root = nullptr;
 	}
 
 public:
@@ -85,7 +85,7 @@ struct SQOuter : public CHAINABLE_OBJ {
 private:
 	SQOuter(SQSharedState *ss, SQObjectPtr *outer) {
 		_valptr = outer;
-		_next = NULL;
+		_next = nullptr;
 		INIT_CHAIN();
 		ADD_TO_CHAIN(&_ss(this)->_gc_chain, this);
 	}
@@ -125,7 +125,7 @@ private:
 	SQGenerator(SQSharedState *ss, SQClosure *closure) {
 		_closure = closure;
 		_state = eRunning;
-		_ci._generator = NULL;
+		_ci._generator = nullptr;
 		INIT_CHAIN();
 		ADD_TO_CHAIN(&_ss(this)->_gc_chain, this);
 	}
@@ -173,7 +173,7 @@ private:
 		_function = func;
 		INIT_CHAIN();
 		ADD_TO_CHAIN(&_ss(this)->_gc_chain, this);
-		_env = NULL;
+		_env = nullptr;
 	}
 
 public:

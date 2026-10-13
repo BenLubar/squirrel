@@ -175,7 +175,7 @@ public:
 		_debugline = 1;
 		_debugop = 0;
 
-		SQFuncState funcstate(_ss(_vm), NULL, ThrowError, this);
+		SQFuncState funcstate(_ss(_vm), nullptr, ThrowError, this);
 		funcstate._name = SQString::Create(_ss(_vm), _SC("main"));
 		_fs = &funcstate;
 		_fs->AddParameter(_fs->CreateString(_SC("this")));

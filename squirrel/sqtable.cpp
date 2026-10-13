@@ -15,7 +15,7 @@ SQTable::SQTable(SQSharedState *ss, SQInteger nInitialSize) {
 	}
 	AllocNodes(pow2size);
 	_usednodes = 0;
-	_delegate = NULL;
+	_delegate = nullptr;
 	INIT_CHAIN();
 	ADD_TO_CHAIN(&_sharedstate->_gc_chain, this);
 }
@@ -40,7 +40,7 @@ void SQTable::Remove(const SQObjectPtr &key) {
 		if (_lastinorder == n) {
 			_lastinorder = n->previnorder;
 		}
-		n->nextinorder = n->previnorder = NULL;
+		n->nextinorder = n->previnorder = nullptr;
 #endif
 		_usednodes--;
 		Rehash(false);
@@ -52,18 +52,18 @@ void SQTable::AllocNodes(SQInteger nSize) {
 	for (SQInteger i = 0; i < nSize; i++) {
 		_HashNode &n = nodes[i];
 		new (&n) _HashNode;
-		n.next = NULL;
+		n.next = nullptr;
 #ifdef KEEP_SLOT_ORDER
-		n.nextinorder = NULL;
-		n.previnorder = NULL;
+		n.nextinorder = nullptr;
+		n.previnorder = nullptr;
 #endif
 	}
 	_numofnodes = nSize;
 	_nodes = nodes;
 	_firstfree = &_nodes[_numofnodes - 1];
 #ifdef KEEP_SLOT_ORDER
-	_firstinorder = NULL;
-	_lastinorder = NULL;
+	_firstinorder = nullptr;
+	_lastinorder = nullptr;
 #endif
 }
 
@@ -223,12 +223,12 @@ bool SQTable::NewSlot(const SQObjectPtr &key, const SQObjectPtr &val) {
 			if (_lastinorder == mp) {
 				_lastinorder = n;
 			}
-			mp->nextinorder = NULL;
-			mp->previnorder = NULL;
+			mp->nextinorder = nullptr;
+			mp->previnorder = nullptr;
 #endif
 			mp->key.Null();
 			mp->val.Null();
-			mp->next = NULL; /* now `mp' is free */
+			mp->next = nullptr; /* now `mp' is free */
 		} else {
 			/* new node will go into free position */
 			n->next = mp->next; /* chain new position */
@@ -250,7 +250,7 @@ bool SQTable::NewSlot(const SQObjectPtr &key, const SQObjectPtr &val) {
 #endif
 
 	for (;;) { /* correct `firstfree' */
-		if (sq_type(_firstfree->key) == OT_NULL && _firstfree->next == NULL) {
+		if (sq_type(_firstfree->key) == OT_NULL && _firstfree->next == nullptr) {
 			mp->val = val;
 			_usednodes++;
 			return true; /* OK; table still has a free place */
@@ -312,20 +312,20 @@ void SQTable::_ClearNodes() {
 		n.key.Null();
 		n.val.Null();
 #ifdef KEEP_SLOT_ORDER
-		n.nextinorder = NULL;
-		n.previnorder = NULL;
+		n.nextinorder = nullptr;
+		n.previnorder = nullptr;
 #endif
 	}
 
 #ifdef KEEP_SLOT_ORDER
-	_firstinorder = NULL;
-	_lastinorder = NULL;
+	_firstinorder = nullptr;
+	_lastinorder = nullptr;
 #endif
 }
 
 void SQTable::Finalize() {
 	_ClearNodes();
-	SetDelegate(NULL);
+	SetDelegate(nullptr);
 }
 
 void SQTable::Clear() {

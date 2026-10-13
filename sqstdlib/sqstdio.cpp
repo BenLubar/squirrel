@@ -63,7 +63,7 @@ SQInteger sqstd_feof(SQFILE file) {
 //File
 struct SQFile : public SQStream {
 	SQFile() {
-		_handle = NULL;
+		_handle = nullptr;
 		_owns = false;
 	}
 	SQFile(SQFILE file, bool owns) {
@@ -82,7 +82,7 @@ struct SQFile : public SQStream {
 	void Close() {
 		if (_handle && _owns) {
 			sqstd_fclose(_handle);
-			_handle = NULL;
+			_handle = nullptr;
 			_owns = false;
 		}
 	}
@@ -160,8 +160,8 @@ static SQInteger _file_constructor(HSQUIRRELVM v) {
 }
 
 static SQInteger _file_close(HSQUIRRELVM v) {
-	SQFile *self = NULL;
-	if (SQ_SUCCEEDED(sq_getinstanceup(v, 1, (SQUserPointer *)&self, (SQUserPointer)SQSTD_FILE_TYPE_TAG, SQTrue)) && self != NULL) {
+	SQFile *self = nullptr;
+	if (SQ_SUCCEEDED(sq_getinstanceup(v, 1, (SQUserPointer *)&self, (SQUserPointer)SQSTD_FILE_TYPE_TAG, SQTrue)) && self != nullptr) {
 		self->Close();
 	}
 	return 0;
@@ -173,7 +173,7 @@ static const SQRegFunction _file_methods[] = {
 	_DECL_FILE_FUNC(constructor, 3, 3, _SC("x")),
 	_DECL_FILE_FUNC(_typeof, 1, 1, _SC("x")),
 	_DECL_FILE_FUNC(close, 1, 1, _SC("x")),
-	{ NULL, (SQFUNCTION)0, 0, 0, NULL }
+	{ nullptr, (SQFUNCTION) nullptr, 0, 0, nullptr }
 };
 
 SQRESULT sqstd_createfile(HSQUIRRELVM v, SQFILE file, SQBool own) {
@@ -199,7 +199,7 @@ SQRESULT sqstd_createfile(HSQUIRRELVM v, SQFILE file, SQBool own) {
 }
 
 SQRESULT sqstd_getfile(HSQUIRRELVM v, SQInteger idx, SQFILE *file) {
-	SQFile *fileobj = NULL;
+	SQFile *fileobj = nullptr;
 	if (SQ_SUCCEEDED(sq_getinstanceup(v, idx, (SQUserPointer *)&fileobj, (SQUserPointer)SQSTD_FILE_TYPE_TAG, SQFalse))) {
 		*file = fileobj->GetHandle();
 		return SQ_OK;
@@ -462,7 +462,7 @@ static const SQRegFunction iolib_funcs[] = {
 	_DECL_GLOBALIO_FUNC(loadfile, 2, 0, _SC(".sb")),
 	_DECL_GLOBALIO_FUNC(dofile, 2, 0, _SC(".sb")),
 	_DECL_GLOBALIO_FUNC(writeclosuretofile, 3, 3, _SC(".sc")),
-	{ NULL, (SQFUNCTION)0, 0, 0, NULL }
+	{ nullptr, (SQFUNCTION) nullptr, 0, 0, nullptr }
 };
 
 SQRESULT sqstd_register_iolib(HSQUIRRELVM v) {

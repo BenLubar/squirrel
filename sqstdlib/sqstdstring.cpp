@@ -13,7 +13,7 @@
 #define MAX_WFORMAT_LEN 3
 #define ADDITIONAL_FORMAT_SPACE (100 * sizeof(SQChar))
 
-static SQUserPointer rex_typetag = NULL;
+static SQUserPointer rex_typetag = nullptr;
 
 static SQBool isfmtchr(SQChar ch) {
 	switch (ch) {
@@ -110,7 +110,7 @@ SQRESULT sqstd_format(HSQUIRRELVM v, SQInteger nformatstringidx, SQInteger *outl
 			}
 			SQInteger addlen = 0;
 			SQInteger valtype = 0;
-			const SQChar *ts = NULL;
+			const SQChar *ts = nullptr;
 			SQInteger ti = 0;
 			SQFloat tf = 0;
 			switch (format[n]) {
@@ -203,7 +203,7 @@ begin:
 }
 
 static SQInteger _string_printf(HSQUIRRELVM v) {
-	SQChar *dest = NULL;
+	SQChar *dest = nullptr;
 	SQInteger length = 0;
 	if (SQ_FAILED(sqstd_format(v, 2, &length, &dest))) {
 		return -1;
@@ -218,7 +218,7 @@ static SQInteger _string_printf(HSQUIRRELVM v) {
 }
 
 static SQInteger _string_format(HSQUIRRELVM v) {
-	SQChar *dest = NULL;
+	SQChar *dest = nullptr;
 	SQInteger length = 0;
 	if (SQ_FAILED(sqstd_format(v, 2, &length, &dest))) {
 		return -1;
@@ -519,11 +519,11 @@ static SQInteger _regexp_subexpcount(HSQUIRRELVM v) {
 }
 
 static SQInteger _regexp_constructor(HSQUIRRELVM v) {
-	SQRex *self = NULL;
+	SQRex *self = nullptr;
 	if (SQ_FAILED(sq_getinstanceup(v, 1, (SQUserPointer *)&self, rex_typetag, SQFalse))) {
 		return sq_throwerror(v, _SC("invalid type tag"));
 	}
-	if (self != NULL) {
+	if (self != nullptr) {
 		return sq_throwerror(v, _SC("invalid regexp object"));
 	}
 	const SQChar *error;
@@ -551,7 +551,7 @@ static const SQRegFunction rexobj_funcs[] = {
 	_DECL_REX_FUNC(capture, 2, 0, _SC("xsn")),
 	_DECL_REX_FUNC(subexpcount, 1, 1, _SC("x")),
 	_DECL_REX_FUNC(_typeof, 1, 1, _SC("x")),
-	{ NULL, (SQFUNCTION)0, 0, 0, NULL }
+	{ nullptr, (SQFUNCTION) nullptr, 0, 0, nullptr }
 };
 #undef _DECL_REX_FUNC
 
@@ -566,7 +566,7 @@ static const SQRegFunction stringlib_funcs[] = {
 	_DECL_FUNC(escape, 2, 2, _SC(".s")),
 	_DECL_FUNC(startswith, 3, 3, _SC(".ss")),
 	_DECL_FUNC(endswith, 3, 3, _SC(".ss")),
-	{ NULL, (SQFUNCTION)0, 0, 0, NULL }
+	{ nullptr, (SQFUNCTION) nullptr, 0, 0, nullptr }
 };
 #undef _DECL_FUNC
 
@@ -576,7 +576,7 @@ SQInteger sqstd_register_stringlib(HSQUIRRELVM v) {
 	rex_typetag = (SQUserPointer)rexobj_funcs;
 	sq_settypetag(v, -1, rex_typetag);
 	SQInteger i = 0;
-	while (rexobj_funcs[i].name != 0) {
+	while (rexobj_funcs[i].name != nullptr) {
 		const SQRegFunction &f = rexobj_funcs[i];
 		sq_pushstring(v, f.name, -1);
 		sq_newclosure(v, f.f, 0);
@@ -588,7 +588,7 @@ SQInteger sqstd_register_stringlib(HSQUIRRELVM v) {
 	sq_newslot(v, -3, SQFalse);
 
 	i = 0;
-	while (stringlib_funcs[i].name != 0) {
+	while (stringlib_funcs[i].name != nullptr) {
 		sq_pushstring(v, stringlib_funcs[i].name, -1);
 		sq_newclosure(v, stringlib_funcs[i].f, 0);
 		sq_setparamscheck(v, stringlib_funcs[i].nparamscheckmin, stringlib_funcs[i].nparamscheckmax, stringlib_funcs[i].typemask);

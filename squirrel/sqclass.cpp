@@ -11,8 +11,8 @@
 
 SQClass::SQClass(SQSharedState *ss, SQClass *base) {
 	_base = base;
-	_typetag = 0;
-	_hook = NULL;
+	_typetag = nullptr;
+	_hook = nullptr;
 	_udsize = 0;
 	_locked = false;
 	_constructoridx = -1;
@@ -141,8 +141,8 @@ bool SQClass::GetAttributes(const SQObjectPtr &key, SQObjectPtr &outval) {
 
 ///////////////////////////////////////////////////////////////////////
 void SQInstance::Init(SQSharedState *ss) {
-	_userpointer = NULL;
-	_hook = NULL;
+	_userpointer = nullptr;
+	_hook = nullptr;
 	__ObjAddRef(_class);
 	_delegate = _class->_members;
 	INIT_CHAIN();
@@ -192,7 +192,7 @@ bool SQInstance::GetMetaMethod(SQVM *SQ_UNUSED_ARG(v), SQMetaMethod mm, SQObject
 
 bool SQInstance::InstanceOf(SQClass *trg) {
 	SQClass *parent = _class;
-	while (parent != NULL) {
+	while (parent != nullptr) {
 		if (parent == trg) {
 			return true;
 		}

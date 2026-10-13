@@ -31,7 +31,7 @@ inline SQHash HashObj(const SQObject &key) {
 struct SQTable : public SQDelegable {
 private:
 	struct _HashNode {
-		_HashNode() { next = NULL; }
+		_HashNode() { next = nullptr; }
 		SQObjectPtr val;
 		SQObjectPtr key;
 		_HashNode *next;
@@ -59,13 +59,13 @@ public:
 	static SQTable *Create(SQSharedState *ss, SQInteger nInitialSize) {
 		SQTable *newtable = (SQTable *)SQ_MALLOC(sizeof(SQTable));
 		new (newtable) SQTable(ss, nInitialSize);
-		newtable->_delegate = NULL;
+		newtable->_delegate = nullptr;
 		return newtable;
 	}
 	void Finalize();
 	SQTable *Clone();
 	~SQTable() {
-		SetDelegate(NULL);
+		SetDelegate(nullptr);
 		REMOVE_FROM_CHAIN(&_sharedstate->_gc_chain, this);
 		for (SQInteger i = 0; i < _numofnodes; i++) {
 			_nodes[i].~_HashNode();
@@ -83,13 +83,13 @@ public:
 				return n;
 			}
 		} while ((n = n->next));
-		return NULL;
+		return nullptr;
 	}
 	//for compiler use
 	inline bool GetStr(const SQChar *key, SQInteger keylen, SQObjectPtr &val) {
 		SQHash hash = _hashstr(key, keylen);
 		_HashNode *n = &_nodes[hash & (_numofnodes - 1)];
-		_HashNode *res = NULL;
+		_HashNode *res = nullptr;
 		do {
 			if (sq_type(n->key) == OT_STRING && (scstrcmp(_stringval(n->key), key) == 0)) {
 				res = n;

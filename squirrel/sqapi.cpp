@@ -51,11 +51,11 @@ HSQUIRRELVM sq_open(SQInteger initialstacksize) {
 	v = (SQVM *)SQ_MALLOC(sizeof(SQVM));
 	new (v) SQVM(ss);
 	ss->_root_vm = v;
-	if (v->Init(NULL, initialstacksize)) {
+	if (v->Init(nullptr, initialstacksize)) {
 		return v;
 	} else {
 		sq_delete(v, SQVM);
-		return NULL;
+		return nullptr;
 	}
 	return v;
 }
@@ -73,7 +73,7 @@ HSQUIRRELVM sq_newthread(HSQUIRRELVM friendvm, SQInteger initialstacksize) {
 		return v;
 	} else {
 		sq_delete(v, SQVM);
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -107,7 +107,7 @@ void sq_setdebughook(HSQUIRRELVM v) {
 	SQObject o = stack_get(v, -1);
 	if (sq_isclosure(o) || sq_isnativeclosure(o) || sq_isnull(o)) {
 		v->_debughook_closure = o;
-		v->_debughook_native = NULL;
+		v->_debughook_native = nullptr;
 		v->_debughook = !sq_isnull(o);
 		v->Pop();
 	}
@@ -190,7 +190,7 @@ const SQChar *sq_objtostring(const HSQOBJECT *o) {
 	if (sq_type(*o) == OT_STRING) {
 		return _stringval(*o);
 	}
-	return NULL;
+	return nullptr;
 }
 
 SQInteger sq_objtointeger(const HSQOBJECT *o) {
@@ -218,7 +218,7 @@ SQUserPointer sq_objtouserpointer(const HSQOBJECT *o) {
 	if (sq_isuserpointer(*o)) {
 		return _userpointer(*o);
 	}
-	return 0;
+	return nullptr;
 }
 
 void sq_pushnull(HSQUIRRELVM v) {
@@ -272,7 +272,7 @@ void sq_newarray(HSQUIRRELVM v, SQInteger size) {
 }
 
 SQRESULT sq_newclass(HSQUIRRELVM v, SQBool hasbase) {
-	SQClass *baseclass = NULL;
+	SQClass *baseclass = nullptr;
 	if (hasbase) {
 		SQObjectPtr &base = stack_get(v, -1);
 		if (sq_type(base) != OT_CLASS) {
@@ -646,7 +646,7 @@ SQRESULT sq_getbool(HSQUIRRELVM v, SQInteger idx, SQBool *b) {
 }
 
 SQRESULT sq_getstringandsize(HSQUIRRELVM v, SQInteger idx, const SQChar **c, SQInteger *size) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_STRING, o);
 	*c = _stringval(*o);
 	*size = _string(*o)->_len;
@@ -654,14 +654,14 @@ SQRESULT sq_getstringandsize(HSQUIRRELVM v, SQInteger idx, const SQChar **c, SQI
 }
 
 SQRESULT sq_getstring(HSQUIRRELVM v, SQInteger idx, const SQChar **c) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_STRING, o);
 	*c = _stringval(*o);
 	return SQ_OK;
 }
 
 SQRESULT sq_getthread(HSQUIRRELVM v, SQInteger idx, HSQUIRRELVM *thread) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_THREAD, o);
 	*thread = _thread(*o);
 	return SQ_OK;
@@ -704,7 +704,7 @@ SQHash sq_gethash(HSQUIRRELVM v, SQInteger idx) {
 }
 
 SQRESULT sq_getuserdata(HSQUIRRELVM v, SQInteger idx, SQUserPointer *p, SQUserPointer *typetag) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_USERDATA, o);
 	(*p) = _userdataval(*o);
 	if (typetag) {
@@ -754,7 +754,7 @@ SQRESULT sq_gettypetag(HSQUIRRELVM v, SQInteger idx, SQUserPointer *typetag) {
 }
 
 SQRESULT sq_getuserpointer(HSQUIRRELVM v, SQInteger idx, SQUserPointer *p) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_USERPOINTER, o);
 	(*p) = _userpointer(*o);
 	return SQ_OK;
@@ -787,14 +787,14 @@ SQRESULT sq_getinstanceup(HSQUIRRELVM v, SQInteger idx, SQUserPointer *p, SQUser
 		return throwerror ? sq_throwerror(v, _SC("the object is not a class instance")) : SQ_ERROR;
 	}
 	(*p) = _instance(o)->_userpointer;
-	if (typetag != 0) {
+	if (typetag != nullptr) {
 		SQClass *cl = _instance(o)->_class;
 		do {
 			if (cl->_typetag == typetag) {
 				return SQ_OK;
 			}
 			cl = cl->_base;
-		} while (cl != NULL);
+		} while (cl != nullptr);
 		return throwerror ? sq_throwerror(v, _SC("invalid type tag")) : SQ_ERROR;
 	}
 	return SQ_OK;
@@ -974,7 +974,7 @@ SQRESULT sq_setdelegate(HSQUIRRELVM v, SQInteger idx) {
 				}
 				v->Pop();
 			} else if (sq_type(mt) == OT_NULL) {
-				_table(self)->SetDelegate(NULL);
+				_table(self)->SetDelegate(nullptr);
 				v->Pop();
 			} else {
 				return sq_aux_invalidtype(v, type);
@@ -985,7 +985,7 @@ SQRESULT sq_setdelegate(HSQUIRRELVM v, SQInteger idx) {
 				_userdata(self)->SetDelegate(_table(mt));
 				v->Pop();
 			} else if (sq_type(mt) == OT_NULL) {
-				_userdata(self)->SetDelegate(NULL);
+				_userdata(self)->SetDelegate(nullptr);
 				v->Pop();
 			} else {
 				return sq_aux_invalidtype(v, type);
@@ -1121,7 +1121,7 @@ const SQChar *sq_getlocal(HSQUIRRELVM v, SQUnsignedInteger level, SQUnsignedInte
 		}
 		SQVM::CallInfo &ci = v->_callsstack[lvl];
 		if (sq_type(ci._closure) != OT_CLOSURE) {
-			return NULL;
+			return nullptr;
 		}
 		SQClosure *c = _closure(ci._closure);
 		SQFunctionProto *func = c->_function;
@@ -1132,7 +1132,7 @@ const SQChar *sq_getlocal(HSQUIRRELVM v, SQUnsignedInteger level, SQUnsignedInte
 		idx -= func->_noutervalues;
 		return func->GetLocal(v, stackbase, idx, (SQInteger)(ci._ip - func->_instructions) - 1);
 	}
-	return NULL;
+	return nullptr;
 }
 
 void sq_pushobject(HSQUIRRELVM v, HSQOBJECT obj) {
@@ -1140,7 +1140,7 @@ void sq_pushobject(HSQUIRRELVM v, HSQOBJECT obj) {
 }
 
 void sq_resetobject(HSQOBJECT *po) {
-	po->_unVal.pUserPointer = NULL;
+	po->_unVal.pUserPointer = nullptr;
 	po->_type = OT_NULL;
 }
 
@@ -1278,7 +1278,7 @@ SQRELEASEHOOK sq_getreleasehook(HSQUIRRELVM v, SQInteger idx) {
 			return _class(ud)->_hook;
 			break;
 		default:
-			return NULL;
+			return nullptr;
 	}
 }
 
@@ -1287,7 +1287,7 @@ void sq_setcompilererrorhandler(HSQUIRRELVM v, SQCOMPILERERROR f) {
 }
 
 SQRESULT sq_writeclosure(HSQUIRRELVM v, SQWRITEFUNC w, SQUserPointer up) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, -1, OT_CLOSURE, o);
 	unsigned short tag = SQ_BYTECODE_STREAM_TAG;
 	if (_closure(*o)->_function->_noutervalues) {
@@ -1350,7 +1350,7 @@ SQRESULT sq_getcallee(HSQUIRRELVM v) {
 
 const SQChar *sq_getfreevariable(HSQUIRRELVM v, SQInteger idx, SQUnsignedInteger nval) {
 	SQObjectPtr &self = stack_get(v, idx);
-	const SQChar *name = NULL;
+	const SQChar *name = nullptr;
 	switch (sq_type(self)) {
 		case OT_CLOSURE: {
 			SQClosure *clo = _closure(self);
@@ -1400,7 +1400,7 @@ SQRESULT sq_setfreevariable(HSQUIRRELVM v, SQInteger idx, SQUnsignedInteger nval
 }
 
 SQRESULT sq_setattributes(HSQUIRRELVM v, SQInteger idx) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_CLASS, o);
 	SQObjectPtr &key = stack_get(v, -2);
 	SQObjectPtr &val = stack_get(v, -1);
@@ -1421,7 +1421,7 @@ SQRESULT sq_setattributes(HSQUIRRELVM v, SQInteger idx) {
 }
 
 SQRESULT sq_getattributes(HSQUIRRELVM v, SQInteger idx) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_CLASS, o);
 	SQObjectPtr &key = stack_get(v, -1);
 	SQObjectPtr attrs;
@@ -1439,7 +1439,7 @@ SQRESULT sq_getattributes(HSQUIRRELVM v, SQInteger idx) {
 }
 
 SQRESULT sq_getmemberhandle(HSQUIRRELVM v, SQInteger idx, HSQMEMBERHANDLE *handle) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_CLASS, o);
 	SQObjectPtr &key = stack_get(v, -1);
 	SQTable *m = _class(*o)->_members;
@@ -1480,7 +1480,7 @@ SQRESULT _getmemberbyhandle(HSQUIRRELVM v, SQObjectPtr &self, const HSQMEMBERHAN
 
 SQRESULT sq_getbyhandle(HSQUIRRELVM v, SQInteger idx, const HSQMEMBERHANDLE *handle) {
 	SQObjectPtr &self = stack_get(v, idx);
-	SQObjectPtr *val = NULL;
+	SQObjectPtr *val = nullptr;
 	if (SQ_FAILED(_getmemberbyhandle(v, self, handle, val))) {
 		return SQ_ERROR;
 	}
@@ -1491,7 +1491,7 @@ SQRESULT sq_getbyhandle(HSQUIRRELVM v, SQInteger idx, const HSQMEMBERHANDLE *han
 SQRESULT sq_setbyhandle(HSQUIRRELVM v, SQInteger idx, const HSQMEMBERHANDLE *handle) {
 	SQObjectPtr &self = stack_get(v, idx);
 	SQObjectPtr &newval = stack_get(v, -1);
-	SQObjectPtr *val = NULL;
+	SQObjectPtr *val = nullptr;
 	if (SQ_FAILED(_getmemberbyhandle(v, self, handle, val))) {
 		return SQ_ERROR;
 	}
@@ -1501,7 +1501,7 @@ SQRESULT sq_setbyhandle(HSQUIRRELVM v, SQInteger idx, const HSQMEMBERHANDLE *han
 }
 
 SQRESULT sq_getbase(HSQUIRRELVM v, SQInteger idx) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_CLASS, o);
 	if (_class(*o)->_base) {
 		v->Push(SQObjectPtr(_class(*o)->_base));
@@ -1512,14 +1512,14 @@ SQRESULT sq_getbase(HSQUIRRELVM v, SQInteger idx) {
 }
 
 SQRESULT sq_getclass(HSQUIRRELVM v, SQInteger idx) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_INSTANCE, o);
 	v->Push(SQObjectPtr(_instance(*o)->_class));
 	return SQ_OK;
 }
 
 SQRESULT sq_createinstance(HSQUIRRELVM v, SQInteger idx) {
-	SQObjectPtr *o = NULL;
+	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_CLASS, o);
 	v->Push(_class(*o)->CreateInstance());
 	return SQ_OK;

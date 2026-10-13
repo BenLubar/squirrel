@@ -62,7 +62,7 @@ static SQInteger _system_clock(HSQUIRRELVM v) {
 }
 
 static SQInteger _system_time(HSQUIRRELVM v) {
-	SQInteger t = (SQInteger)time(NULL);
+	SQInteger t = (SQInteger)time(nullptr);
 	sq_pushinteger(v, t);
 	return 1;
 }
@@ -131,18 +131,18 @@ static SQInteger _system_date(HSQUIRRELVM v) {
 static const SQRegFunction systemlib_funcs[] = {
 	_DECL_FUNC(getenv, 2, 2, _SC(".s")),
 	_DECL_FUNC(system, 2, 2, _SC(".s")),
-	_DECL_FUNC(clock, 0, 0, NULL),
-	_DECL_FUNC(time, 1, 1, NULL),
+	_DECL_FUNC(clock, 0, 0, nullptr),
+	_DECL_FUNC(time, 1, 1, nullptr),
 	_DECL_FUNC(date, 1, 0, _SC(".nn")),
 	_DECL_FUNC(remove, 2, 2, _SC(".s")),
 	_DECL_FUNC(rename, 3, 3, _SC(".ss")),
-	{ NULL, (SQFUNCTION)0, 0, 0, NULL }
+	{ nullptr, (SQFUNCTION) nullptr, 0, 0, nullptr }
 };
 #undef _DECL_FUNC
 
 SQInteger sqstd_register_systemlib(HSQUIRRELVM v) {
 	SQInteger i = 0;
-	while (systemlib_funcs[i].name != 0) {
+	while (systemlib_funcs[i].name != nullptr) {
 		sq_pushstring(v, systemlib_funcs[i].name, -1);
 		sq_newclosure(v, systemlib_funcs[i].f, 0);
 		sq_setparamscheck(v, systemlib_funcs[i].nparamscheckmin, systemlib_funcs[i].nparamscheckmax, systemlib_funcs[i].typemask);

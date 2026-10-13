@@ -76,10 +76,10 @@ static const SQRegFunction mathlib_funcs[] = {
 	_DECL_FUNC(ceil, 2, 2, _SC(".n")),
 	_DECL_FUNC(exp, 2, 2, _SC(".n")),
 	_DECL_FUNC(srand, 2, 2, _SC(".n")),
-	_DECL_FUNC(rand, 1, 1, NULL),
+	_DECL_FUNC(rand, 1, 1, nullptr),
 	_DECL_FUNC(fabs, 2, 2, _SC(".n")),
 	_DECL_FUNC(abs, 2, 2, _SC(".n")),
-	{ NULL, (SQFUNCTION)0, 0, 0, NULL }
+	{ nullptr, (SQFUNCTION) nullptr, 0, 0, nullptr }
 };
 #undef _DECL_FUNC
 
@@ -89,7 +89,7 @@ static const SQRegFunction mathlib_funcs[] = {
 
 SQRESULT sqstd_register_mathlib(HSQUIRRELVM v) {
 	SQInteger i = 0;
-	while (mathlib_funcs[i].name != 0) {
+	while (mathlib_funcs[i].name != nullptr) {
 		sq_pushstring(v, mathlib_funcs[i].name, -1);
 		sq_newclosure(v, mathlib_funcs[i].f, 0);
 		sq_setparamscheck(v, mathlib_funcs[i].nparamscheckmin, mathlib_funcs[i].nparamscheckmax, mathlib_funcs[i].typemask);

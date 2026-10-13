@@ -124,7 +124,7 @@ const SQChar *SQLexer::Tok2Str(SQInteger tok) {
 			return _stringval(key);
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void SQLexer::LexBlockComment() {

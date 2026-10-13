@@ -13,13 +13,13 @@
 #include "sqvm.h"
 
 SQSharedState::SQSharedState() {
-	_compilererrorhandler = NULL;
-	_printfunc = NULL;
-	_errorfunc = NULL;
+	_compilererrorhandler = nullptr;
+	_printfunc = nullptr;
+	_errorfunc = nullptr;
 	_debuginfo = false;
 	_notifyallexceptions = false;
-	_foreignptr = NULL;
-	_releasehook = NULL;
+	_foreignptr = nullptr;
+	_releasehook = nullptr;
 }
 
 #define newsysstring(s) \
@@ -115,13 +115,13 @@ bool CompileTypemask(SQIntVec &res, const SQChar *typemask) {
 SQTable *CreateDefaultDelegate(SQSharedState *ss, const SQRegFunction *funcz) {
 	SQInteger i = 0;
 	SQTable *t = SQTable::Create(ss, 0);
-	while (funcz[i].name != 0) {
+	while (funcz[i].name != nullptr) {
 		SQNativeClosure *nc = SQNativeClosure::Create(ss, funcz[i].f, 0);
 		nc->_nparamscheckmin = funcz[i].nparamscheckmin;
 		nc->_nparamscheckmax = funcz[i].nparamscheckmax;
 		nc->_name = SQString::Create(ss, funcz[i].name);
 		if (funcz[i].typemask && !CompileTypemask(nc->_typecheck, funcz[i].typemask)) {
-			return NULL;
+			return nullptr;
 		}
 		t->NewSlot(SQString::Create(ss, funcz[i].name), nc);
 		i++;
@@ -130,10 +130,10 @@ SQTable *CreateDefaultDelegate(SQSharedState *ss, const SQRegFunction *funcz) {
 }
 
 void SQSharedState::Init() {
-	_scratchpad = NULL;
+	_scratchpad = nullptr;
 	_scratchpadsize = 0;
 #ifndef NO_GARBAGE_COLLECTOR
-	_gc_chain = NULL;
+	_gc_chain = nullptr;
 #endif
 	_stringtable = (SQStringTable *)SQ_MALLOC(sizeof(SQStringTable));
 	new (_stringtable) SQStringTable(this);
@@ -196,7 +196,7 @@ void SQSharedState::Init() {
 SQSharedState::~SQSharedState() {
 	if (_releasehook) {
 		_releasehook(_foreignptr, 0);
-		_releasehook = NULL;
+		_releasehook = nullptr;
 	}
 	_constructoridx.Null();
 	_table(_registry)->Finalize();
@@ -224,7 +224,7 @@ SQSharedState::~SQSharedState() {
 	_refs_table.Finalize();
 #ifndef NO_GARBAGE_COLLECTOR
 	SQCollectable *t = _gc_chain;
-	SQCollectable *nx = NULL;
+	SQCollectable *nx = nullptr;
 	if (t) {
 		t->_uiRef++;
 		while (t) {
@@ -331,7 +331,7 @@ void SQSharedState::RunMark(SQVM *SQ_UNUSED_ARG(vm), SQCollectable **tchain) {
 
 SQInteger SQSharedState::ResurrectUnreachable(SQVM *vm) {
 	SQInteger n = 0;
-	SQCollectable *tchain = NULL;
+	SQCollectable *tchain = nullptr;
 
 	RunMark(vm, &tchain);
 
@@ -340,10 +340,10 @@ SQInteger SQSharedState::ResurrectUnreachable(SQVM *vm) {
 
 	_gc_chain = tchain;
 
-	SQArray *ret = NULL;
+	SQArray *ret = nullptr;
 	if (resurrected) {
 		ret = SQArray::Create(this, 0);
-		SQCollectable *rlast = NULL;
+		SQCollectable *rlast = nullptr;
 		while (t) {
 			rlast = t;
 			SQObjectType type = t->GetType();
@@ -382,12 +382,12 @@ SQInteger SQSharedState::ResurrectUnreachable(SQVM *vm) {
 
 SQInteger SQSharedState::CollectGarbage(SQVM *vm) {
 	SQInteger n = 0;
-	SQCollectable *tchain = NULL;
+	SQCollectable *tchain = nullptr;
 
 	RunMark(vm, &tchain);
 
 	SQCollectable *t = _gc_chain;
-	SQCollectable *nx = NULL;
+	SQCollectable *nx = nullptr;
 	if (t) {
 		t->_uiRef++;
 		while (t) {
@@ -417,7 +417,7 @@ SQInteger SQSharedState::CollectGarbage(SQVM *vm) {
 
 #ifndef NO_GARBAGE_COLLECTOR
 void SQCollectable::AddToChain(SQCollectable **chain, SQCollectable *c) {
-	c->_prev = NULL;
+	c->_prev = nullptr;
 	c->_next = *chain;
 	if (*chain) {
 		(*chain)->_prev = c;
@@ -434,8 +434,8 @@ void SQCollectable::RemoveFromChain(SQCollectable **chain, SQCollectable *c) {
 	if (c->_next) {
 		c->_next->_prev = c->_prev;
 	}
-	c->_next = NULL;
-	c->_prev = NULL;
+	c->_next = nullptr;
+	c->_prev = nullptr;
 }
 #endif
 
@@ -565,7 +565,7 @@ RefTable::RefNode *RefTable::Add(SQHash mainpos, SQObject &obj) {
 RefTable::RefNode *RefTable::Get(SQObject &obj, SQHash &mainpos, RefNode **prev, bool add) {
 	RefNode *ref;
 	mainpos = ::HashObj(obj) & (_numofslots - 1);
-	*prev = NULL;
+	*prev = nullptr;
 	for (ref = _buckets[mainpos]; ref;) {
 		if (_rawval(ref->obj) == _rawval(obj) && sq_type(ref->obj) == sq_type(obj)) {
 			break;
@@ -573,7 +573,7 @@ RefTable::RefNode *RefTable::Get(SQObject &obj, SQHash &mainpos, RefNode **prev,
 		*prev = ref;
 		ref = ref->next;
 	}
-	if (ref == NULL && add) {
+	if (ref == nullptr && add) {
 		if (_numofslots == _slotused) {
 			assert(_freelist == 0);
 			Resize(_numofslots * 2);
@@ -592,16 +592,16 @@ void RefTable::AllocNodes(SQUnsignedInteger size) {
 	RefNode *temp = nodes;
 	SQUnsignedInteger n;
 	for (n = 0; n < size - 1; n++) {
-		bucks[n] = NULL;
+		bucks[n] = nullptr;
 		temp->refs = 0;
 		new (&temp->obj) SQObjectPtr;
 		temp->next = temp + 1;
 		temp++;
 	}
-	bucks[n] = NULL;
+	bucks[n] = nullptr;
 	temp->refs = 0;
 	new (&temp->obj) SQObjectPtr;
-	temp->next = NULL;
+	temp->next = nullptr;
 	_freelist = nodes;
 	_nodes = nodes;
 	_buckets = bucks;
@@ -624,7 +624,7 @@ SQStringTable::SQStringTable(SQSharedState *ss) {
 
 SQStringTable::~SQStringTable() {
 	SQ_FREE(_strings, sizeof(SQString *) * _numofslots);
-	_strings = NULL;
+	_strings = nullptr;
 }
 
 void SQStringTable::AllocNodes(SQInteger size) {
@@ -715,7 +715,7 @@ void SQStringTable::Resize(SQInteger size) {
 
 void SQStringTable::Remove(SQString *bs) {
 	SQString *s;
-	SQString *prev = NULL;
+	SQString *prev = nullptr;
 	SQHash h = bs->_hash & (_numofslots - 1);
 
 	for (s = _strings[h]; s;) {

@@ -9,25 +9,25 @@
 
 struct SQUserData : SQDelegable {
 	SQUserData(SQSharedState *ss) {
-		_delegate = 0;
-		_hook = NULL;
+		_delegate = nullptr;
+		_hook = nullptr;
 		INIT_CHAIN();
 		ADD_TO_CHAIN(&_ss(this)->_gc_chain, this);
 	}
 	~SQUserData() {
 		REMOVE_FROM_CHAIN(&_ss(this)->_gc_chain, this);
-		SetDelegate(NULL);
+		SetDelegate(nullptr);
 	}
 	static SQUserData *Create(SQSharedState *ss, SQInteger size) {
 		SQUserData *ud = (SQUserData *)SQ_MALLOC(sq_aligning(sizeof(SQUserData)) + size);
 		new (ud) SQUserData(ss);
 		ud->_size = size;
-		ud->_typetag = 0;
+		ud->_typetag = nullptr;
 		return ud;
 	}
 #ifndef NO_GARBAGE_COLLECTOR
 	void Mark(SQCollectable **chain);
-	void Finalize() { SetDelegate(NULL); }
+	void Finalize() { SetDelegate(nullptr); }
 	SQObjectType GetType() { return OT_USERDATA; }
 #endif
 	void Release() {

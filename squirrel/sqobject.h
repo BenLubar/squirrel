@@ -91,7 +91,7 @@ struct SQRefCounted {
 	struct SQWeakRef *_weakref;
 	SQRefCounted() {
 		_uiRef = 0;
-		_weakref = NULL;
+		_weakref = nullptr;
 	}
 	virtual ~SQRefCounted();
 	SQWeakRef *GetWeakRef(SQObjectType type);
@@ -206,7 +206,7 @@ struct SQObjectPtr : public SQObject {
 	SQObjectPtr() {
 		SQ_OBJECT_RAWINIT()
 		_type = OT_NULL;
-		_unVal.pUserPointer = NULL;
+		_unVal.pUserPointer = nullptr;
 	}
 	SQObjectPtr(const SQObjectPtr &o) {
 		_type = o._type;
