@@ -76,7 +76,8 @@ static SQInteger _system_remove(HSQUIRRELVM v) {
 }
 
 static SQInteger _system_rename(HSQUIRRELVM v) {
-	const SQChar *oldn, *newn;
+	const SQChar *oldn;
+	const SQChar *newn;
 	sq_getstring(v, 2, &oldn);
 	sq_getstring(v, 3, &newn);
 	if (screname(oldn, newn) == -1) {

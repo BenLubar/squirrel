@@ -213,7 +213,8 @@ static SQInteger base_error(HSQUIRRELVM v) {
 
 static SQInteger base_compilestring(HSQUIRRELVM v) {
 	SQInteger nargs = sq_gettop(v);
-	const SQChar *src = NULL, *name = _SC("unnamedbuffer");
+	const SQChar *src = NULL;
+	const SQChar *name = _SC("unnamedbuffer");
 	SQInteger size;
 	sq_getstring(v, 2, &src);
 	size = sq_getsize(v, 2);
@@ -447,7 +448,9 @@ static SQInteger table_filter(HSQUIRRELVM v) {
 	SQTable *tbl = _table(o);
 	SQObjectPtr ret = SQTable::Create(_ss(v), 0);
 
-	SQObjectPtr itr, key, val;
+	SQObjectPtr itr;
+	SQObjectPtr key;
+	SQObjectPtr val;
 	SQInteger nitr;
 	while ((nitr = tbl->Next(false, itr, key, val)) != -1) {
 		itr = (SQInteger)nitr;
@@ -471,10 +474,13 @@ static SQInteger table_filter(HSQUIRRELVM v) {
 static SQInteger table_map(HSQUIRRELVM v) {
 	SQObject &o = stack_get(v, 1);
 	SQTable *tbl = _table(o);
-	SQInteger nitr, n = 0;
+	SQInteger nitr;
+	SQInteger n = 0;
 	SQInteger nitems = tbl->CountUsed();
 	SQObjectPtr ret = SQArray::Create(_ss(v), nitems);
-	SQObjectPtr itr, key, val;
+	SQObjectPtr itr;
+	SQObjectPtr key;
+	SQObjectPtr val;
 	while ((nitr = tbl->Next(false, itr, key, val)) != -1) {
 		itr = (SQInteger)nitr;
 
@@ -850,7 +856,8 @@ static SQInteger array_sort(HSQUIRRELVM v) {
 }
 
 static SQInteger array_slice(HSQUIRRELVM v) {
-	SQInteger sidx, eidx;
+	SQInteger sidx;
+	SQInteger eidx;
 	SQObjectPtr o;
 	if (get_slice_params(v, sidx, eidx, o) == -1) {
 		return -1;
@@ -905,7 +912,8 @@ const SQRegFunction SQSharedState::_array_default_delegate_funcz[] = {
 
 //STRING DEFAULT DELEGATE//////////////////////////
 static SQInteger string_slice(HSQUIRRELVM v) {
-	SQInteger sidx, eidx;
+	SQInteger sidx;
+	SQInteger eidx;
 	SQObjectPtr o;
 	if (SQ_FAILED(get_slice_params(v, sidx, eidx, o))) {
 		return -1;
@@ -928,8 +936,11 @@ static SQInteger string_slice(HSQUIRRELVM v) {
 }
 
 static SQInteger string_find(HSQUIRRELVM v) {
-	SQInteger top, start_idx = 0;
-	const SQChar *str, *substr, *ret;
+	SQInteger top;
+	SQInteger start_idx = 0;
+	const SQChar *str;
+	const SQChar *substr;
+	const SQChar *ret;
 	if (((top = sq_gettop(v)) > 1) && SQ_SUCCEEDED(sq_getstring(v, 1, &str)) && SQ_SUCCEEDED(sq_getstring(v, 2, &substr))) {
 		if (top > 2) {
 			sq_getinteger(v, 3, &start_idx);

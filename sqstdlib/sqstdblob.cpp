@@ -65,7 +65,8 @@ static SQInteger _blob_swap2(HSQUIRRELVM v) {
 
 static SQInteger _blob__set(HSQUIRRELVM v) {
 	SETUP_BLOB(v);
-	SQInteger idx, val;
+	SQInteger idx;
+	SQInteger val;
 	sq_getinteger(v, 2, &idx);
 	sq_getinteger(v, 3, &val);
 	if (idx < 0 || idx >= self->Len()) {

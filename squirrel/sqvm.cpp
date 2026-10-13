@@ -23,7 +23,8 @@
 bool SQVM::BW_OP(SQUnsignedInteger op, SQObjectPtr &trg, const SQObjectPtr &o1, const SQObjectPtr &o2) {
 	SQInteger res;
 	if ((sq_type(o1) | sq_type(o2)) == OT_INTEGER) {
-		SQInteger i1 = _integer(o1), i2 = _integer(o2);
+		SQInteger i1 = _integer(o1);
+		SQInteger i2 = _integer(o2);
 		switch (op) {
 			case BW_AND:
 				res = i1 & i2;
@@ -99,7 +100,9 @@ bool SQVM::ARITH_OP(SQUnsignedInteger op, SQObjectPtr &trg, const SQObjectPtr &o
 	SQInteger tmask = sq_type(o1) | sq_type(o2);
 	switch (tmask) {
 		case OT_INTEGER: {
-			SQInteger res, i1 = _integer(o1), i2 = _integer(o2);
+			SQInteger res;
+			SQInteger i1 = _integer(o1);
+			SQInteger i2 = _integer(o2);
 			switch (op) {
 				case '+':
 					res = i1 + i2;
@@ -137,7 +140,9 @@ bool SQVM::ARITH_OP(SQUnsignedInteger op, SQObjectPtr &trg, const SQObjectPtr &o
 		} break;
 		case (OT_FLOAT | OT_INTEGER):
 		case (OT_FLOAT): {
-			SQFloat res, f1 = tofloat(o1), f2 = tofloat(o2);
+			SQFloat res;
+			SQFloat f1 = tofloat(o1);
+			SQFloat f2 = tofloat(o2);
 			switch (op) {
 				case '+':
 					res = f1 + f2;
@@ -289,7 +294,8 @@ bool SQVM::NEG_OP(SQObjectPtr &trg, const SQObjectPtr &o) {
 		return true; \
 	}
 bool SQVM::ObjCmp(const SQObjectPtr &o1, const SQObjectPtr &o2, SQInteger &result, bool &alwaysfalse) {
-	SQObjectType t1 = sq_type(o1), t2 = sq_type(o2);
+	SQObjectType t1 = sq_type(o1);
+	SQObjectType t2 = sq_type(o2);
 	alwaysfalse = false;
 	if ((t1 == OT_FLOAT && isnan(_float(o1))) || (t2 == OT_FLOAT && isnan(_float(o2)))) {
 		alwaysfalse = true;
@@ -447,7 +453,8 @@ bool SQVM::ToString(const SQObjectPtr &o, SQObjectPtr &res) {
 }
 
 bool SQVM::StringCat(const SQObjectPtr &str, const SQObjectPtr &obj, SQObjectPtr &dest) {
-	SQObjectPtr a, b;
+	SQObjectPtr a;
+	SQObjectPtr b;
 	if (!ToString(str, a)) {
 		return false;
 	}
@@ -615,7 +622,9 @@ bool SQVM::PLOCAL_INC(SQInteger op, SQObjectPtr &target, SQObjectPtr &a, SQObjec
 }
 
 bool SQVM::DerefInc(SQInteger op, SQObjectPtr &target, SQObjectPtr &self, SQObjectPtr &key, SQObjectPtr &incr, bool postfix, SQInteger selfidx) {
-	SQObjectPtr tmp, tself = self, tkey = key;
+	SQObjectPtr tmp;
+	SQObjectPtr tself = self;
+	SQObjectPtr tkey = key;
 	if (!Get(tself, tkey, tmp, 0, selfidx)) {
 		return false;
 	}
@@ -808,7 +817,8 @@ bool SQVM::CLASS_OP(SQObjectPtr &target, SQInteger baseclass, SQInteger attribut
 }
 
 bool SQVM::IsEqual(const SQObjectPtr &o1, const SQObjectPtr &o2, bool &res) {
-	SQObjectType t1 = sq_type(o1), t2 = sq_type(o2);
+	SQObjectType t1 = sq_type(o1);
+	SQObjectType t2 = sq_type(o2);
 	if (t1 == t2) {
 		if (t1 == OT_FLOAT) {
 			res = (_float(o1) == _float(o2));

@@ -606,7 +606,9 @@ SQFunctionProto *SQFuncState::BuildProto() {
 			_nliterals, _parameters.size(), _functions.size(), _outervalues.size(),
 			_lineinfos.size(), _localvarinfos.size(), _defaultparams.size());
 
-	SQObjectPtr refidx, key, val;
+	SQObjectPtr refidx;
+	SQObjectPtr key;
+	SQObjectPtr val;
 	SQInteger idx;
 
 	f->_stacksize = _stacksize;

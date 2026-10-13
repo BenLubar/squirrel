@@ -114,7 +114,9 @@ void SQLexer::Next() {
 }
 
 const SQChar *SQLexer::Tok2Str(SQInteger tok) {
-	SQObjectPtr itr, key, val;
+	SQObjectPtr itr;
+	SQObjectPtr key;
+	SQObjectPtr val;
 	SQInteger nitr;
 	while ((nitr = _keywords->Next(false, itr, key, val)) != -1) {
 		itr = (SQInteger)nitr;
@@ -622,7 +624,8 @@ SQInteger SQLexer::ReadNumber() {
 #define THEX 3
 #define TSCIENTIFIC 4
 #define TOCTAL 5
-	SQInteger type = TINT, firstchar = CUR_CHAR;
+	SQInteger type = TINT;
+	SQInteger firstchar = CUR_CHAR;
 	SQChar *sTemp;
 	INIT_TEMP_STRING();
 	NEXT();

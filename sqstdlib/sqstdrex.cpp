@@ -174,7 +174,8 @@ static SQInteger sqstd_rex_charnode(SQRex *exp, SQBool isclass) {
 				return sqstd_rex_charclass(exp, t);
 			}
 			case 'm': {
-				SQChar cb, ce; //cb = character begin match ce = character end match
+				SQChar cb; // character begin match
+				SQChar ce; // character end match
 				cb = *++exp->_p; //skip 'm'
 				ce = *++exp->_p;
 				exp->_p++; //points to the next char to be parsed
@@ -214,7 +215,8 @@ static SQInteger sqstd_rex_charnode(SQRex *exp, SQBool isclass) {
 }
 static SQInteger sqstd_rex_class(SQRex *exp) {
 	SQInteger ret = -1;
-	SQInteger first = -1, chain;
+	SQInteger first = -1;
+	SQInteger chain;
 	if (*exp->_p == SQREX_SYMBOL_BEGINNING_OF_STRING) {
 		ret = sqstd_rex_newnode(exp, OP_NCLASS);
 		exp->_p++;
@@ -318,7 +320,8 @@ static SQInteger sqstd_rex_element(SQRex *exp) {
 	}
 
 	SQBool isgreedy = SQFalse;
-	unsigned short p0 = 0, p1 = 0;
+	unsigned short p0 = 0;
+	unsigned short p1 = 0;
 	switch (*exp->_p) {
 		case SQREX_SYMBOL_GREEDY_ZERO_OR_MORE:
 			p0 = 0;
@@ -381,7 +384,8 @@ static SQInteger sqstd_rex_element(SQRex *exp) {
 }
 
 static SQInteger sqstd_rex_list(SQRex *exp) {
-	SQInteger ret = -1, e;
+	SQInteger ret = -1;
+	SQInteger e;
 	if (*exp->_p == SQREX_SYMBOL_BEGINNING_OF_STRING) {
 		exp->_p++;
 		ret = sqstd_rex_newnode(exp, OP_BOL);
@@ -394,7 +398,8 @@ static SQInteger sqstd_rex_list(SQRex *exp) {
 	}
 
 	if (*exp->_p == SQREX_SYMBOL_BRANCH) {
-		SQInteger temp, tright;
+		SQInteger temp;
+		SQInteger tright;
 		exp->_p++;
 		temp = sqstd_rex_newnode(exp, OP_OR);
 		exp->_nodes[temp].left = ret;
@@ -471,8 +476,11 @@ static const SQChar *sqstd_rex_matchnode(SQRex *exp, SQRexNode *node, const SQCh
 		case OP_GREEDY: {
 			//SQRexNode *greedystop = (node->next != -1) ? &exp->_nodes[node->next] : NULL;
 			SQRexNode *greedystop = NULL;
-			SQInteger p0 = (node->right >> 16) & 0x0000FFFF, p1 = node->right & 0x0000FFFF, nmaches = 0;
-			const SQChar *s = str, *good = str;
+			SQInteger p0 = (node->right >> 16) & 0x0000FFFF;
+			SQInteger p1 = node->right & 0x0000FFFF;
+			SQInteger nmaches = 0;
+			const SQChar *s = str;
+			const SQChar *good = str;
 
 			if (node->next != -1) {
 				greedystop = &exp->_nodes[node->next];

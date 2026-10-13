@@ -130,7 +130,8 @@ static SQInteger _file_releasehook(SQUserPointer p, SQInteger SQ_UNUSED_ARG(size
 }
 
 static SQInteger _file_constructor(HSQUIRRELVM v) {
-	const SQChar *filename, *mode;
+	const SQChar *filename;
+	const SQChar *mode;
 	bool owns = true;
 	SQFile *f;
 	SQFILE newf;

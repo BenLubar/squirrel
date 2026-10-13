@@ -955,7 +955,8 @@ public:
 				break;
 			case _SC('['): {
 				_fs->AddInstruction(_OP_NEWOBJ, _fs->PushTarget(), 0, 0, NOT_ARRAY);
-				SQInteger apos = _fs->GetCurrentPos(), key = 0;
+				SQInteger apos = _fs->GetCurrentPos();
+				SQInteger key = 0;
 				Lex();
 				while (_token != _SC(']')) {
 					Expression();
@@ -1161,7 +1162,8 @@ public:
 		}
 	}
 	void ParseTableOrClass(SQInteger separator, SQInteger terminator) {
-		SQInteger tpos = _fs->GetCurrentPos(), nkeys = 0;
+		SQInteger tpos = _fs->GetCurrentPos();
+		SQInteger nkeys = 0;
 		while (_token != terminator) {
 			bool hasattrs = false;
 			bool isstatic = false;
@@ -1320,7 +1322,8 @@ public:
 		_fs->SetInstructionParam(jnepos, 1, endifblock - jnepos + (haselse ? 1 : 0));
 	}
 	void WhileStatement() {
-		SQInteger jzpos, jmppos;
+		SQInteger jzpos;
+		SQInteger jmppos;
 		jmppos = _fs->GetCurrentPos();
 		Lex();
 		Expect(_SC('('));
@@ -1411,7 +1414,8 @@ public:
 		END_SCOPE();
 	}
 	void ForEachStatement() {
-		SQObject idxname, valname;
+		SQObject idxname;
+		SQObject valname;
 		Lex();
 		Expect(_SC('('));
 		valname = Expect(TK_IDENTIFIER);

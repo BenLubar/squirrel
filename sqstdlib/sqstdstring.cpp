@@ -85,7 +85,10 @@ SQRESULT sqstd_format(HSQUIRRELVM v, SQInteger nformatstringidx, SQInteger *outl
 	SQInteger format_size = sq_getsize(v, nformatstringidx);
 	SQInteger allocated = (format_size + 2) * sizeof(SQChar);
 	dest = sq_getscratchpad(v, allocated);
-	SQInteger n = 0, i = 0, nparam = nformatstringidx + 1, w = 0;
+	SQInteger n = 0;
+	SQInteger i = 0;
+	SQInteger nparam = nformatstringidx + 1;
+	SQInteger w = 0;
 	//while(format[n] != '\0')
 	while (n < format_size) {
 		if (format[n] != '%') {
@@ -244,7 +247,9 @@ static void __strip_r(const SQChar *str, SQInteger len, const SQChar **end) {
 }
 
 static SQInteger _string_strip(HSQUIRRELVM v) {
-	const SQChar *str, *start, *end;
+	const SQChar *str;
+	const SQChar *start;
+	const SQChar *end;
 	sq_getstring(v, 2, &str);
 	SQInteger len = sq_getsize(v, 2);
 	__strip_l(str, &start);
@@ -254,7 +259,8 @@ static SQInteger _string_strip(HSQUIRRELVM v) {
 }
 
 static SQInteger _string_lstrip(HSQUIRRELVM v) {
-	const SQChar *str, *start;
+	const SQChar *str;
+	const SQChar *start;
 	sq_getstring(v, 2, &str);
 	__strip_l(str, &start);
 	sq_pushstring(v, start, -1);
@@ -262,7 +268,8 @@ static SQInteger _string_lstrip(HSQUIRRELVM v) {
 }
 
 static SQInteger _string_rstrip(HSQUIRRELVM v) {
-	const SQChar *str, *end;
+	const SQChar *str;
+	const SQChar *end;
 	sq_getstring(v, 2, &str);
 	SQInteger len = sq_getsize(v, 2);
 	__strip_r(str, len, &end);
@@ -271,7 +278,8 @@ static SQInteger _string_rstrip(HSQUIRRELVM v) {
 }
 
 static SQInteger _string_split(HSQUIRRELVM v) {
-	const SQChar *str, *seps;
+	const SQChar *str;
+	const SQChar *seps;
 	SQInteger sepsize;
 	SQBool skipempty = SQFalse;
 	sq_getstring(v, 2, &str);
@@ -308,7 +316,8 @@ static SQInteger _string_split(HSQUIRRELVM v) {
 
 static SQInteger _string_escape(HSQUIRRELVM v) {
 	const SQChar *str;
-	SQChar *dest, *resstr;
+	SQChar *dest;
+	SQChar *resstr;
 	SQInteger size;
 	sq_getstring(v, 2, &str);
 	size = sq_getsize(v, 2);
@@ -394,7 +403,8 @@ static SQInteger _string_escape(HSQUIRRELVM v) {
 }
 
 static SQInteger _string_startswith(HSQUIRRELVM v) {
-	const SQChar *str, *cmp;
+	const SQChar *str;
+	const SQChar *cmp;
 	sq_getstring(v, 2, &str);
 	sq_getstring(v, 3, &cmp);
 	SQInteger len = sq_getsize(v, 2);
@@ -408,7 +418,8 @@ static SQInteger _string_startswith(HSQUIRRELVM v) {
 }
 
 static SQInteger _string_endswith(HSQUIRRELVM v) {
-	const SQChar *str, *cmp;
+	const SQChar *str;
+	const SQChar *cmp;
 	sq_getstring(v, 2, &str);
 	sq_getstring(v, 3, &cmp);
 	SQInteger len = sq_getsize(v, 2);
@@ -457,7 +468,9 @@ static void _addrexmatch(HSQUIRRELVM v, const SQChar *str, const SQChar *begin, 
 
 static SQInteger _regexp_search(HSQUIRRELVM v) {
 	SETUP_REX(v);
-	const SQChar *str, *begin, *end;
+	const SQChar *str;
+	const SQChar *begin;
+	const SQChar *end;
 	SQInteger start = 0;
 	sq_getstring(v, 2, &str);
 	if (sq_gettop(v) > 2) {
@@ -472,7 +485,9 @@ static SQInteger _regexp_search(HSQUIRRELVM v) {
 
 static SQInteger _regexp_capture(HSQUIRRELVM v) {
 	SETUP_REX(v);
-	const SQChar *str, *begin, *end;
+	const SQChar *str;
+	const SQChar *begin;
+	const SQChar *end;
 	SQInteger start = 0;
 	sq_getstring(v, 2, &str);
 	if (sq_gettop(v) > 2) {
@@ -510,7 +525,8 @@ static SQInteger _regexp_constructor(HSQUIRRELVM v) {
 	if (self != NULL) {
 		return sq_throwerror(v, _SC("invalid regexp object"));
 	}
-	const SQChar *error, *pattern;
+	const SQChar *error;
+	const SQChar *pattern;
 	sq_getstring(v, 2, &pattern);
 	SQRex *rex = sqstd_rex_compile(pattern, &error);
 	if (!rex) {

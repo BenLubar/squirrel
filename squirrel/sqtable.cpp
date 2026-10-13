@@ -154,7 +154,8 @@ SQTable *SQTable::Clone() {
 	nt->_usednodes = _usednodes;
 #else
 	SQInteger ridx = 0;
-	SQObjectPtr key, val;
+	SQObjectPtr key;
+	SQObjectPtr val;
 	while ((ridx = Next(true, ridx, key, val)) != -1) {
 		nt->NewSlot(key, val);
 	}

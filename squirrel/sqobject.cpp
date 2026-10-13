@@ -429,9 +429,14 @@ SQFunctionProto::~SQFunctionProto() {
 }
 
 bool SQFunctionProto::Save(SQVM *v, SQUserPointer up, SQWRITEFUNC write) {
-	SQInteger i, nliterals = _nliterals, nparameters = _nparameters;
-	SQInteger noutervalues = _noutervalues, nlocalvarinfos = _nlocalvarinfos;
-	SQInteger nlineinfos = _nlineinfos, ninstructions = _ninstructions, nfunctions = _nfunctions;
+	SQInteger i;
+	SQInteger nliterals = _nliterals;
+	SQInteger nparameters = _nparameters;
+	SQInteger noutervalues = _noutervalues;
+	SQInteger nlocalvarinfos = _nlocalvarinfos;
+	SQInteger nlineinfos = _nlineinfos;
+	SQInteger ninstructions = _ninstructions;
+	SQInteger nfunctions = _nfunctions;
 	SQInteger ndefaultparams = _ndefaultparams;
 	_CHECK_IO(WriteTag(v, write, up, SQ_CLOSURESTREAM_PART));
 	_CHECK_IO(WriteObject(v, up, write, _sourcename));
@@ -491,10 +496,17 @@ bool SQFunctionProto::Save(SQVM *v, SQUserPointer up, SQWRITEFUNC write) {
 }
 
 bool SQFunctionProto::Load(SQVM *v, SQUserPointer up, SQREADFUNC read, SQObjectPtr &ret) {
-	SQInteger i, nliterals, nparameters;
-	SQInteger noutervalues, nlocalvarinfos;
-	SQInteger nlineinfos, ninstructions, nfunctions, ndefaultparams;
-	SQObjectPtr sourcename, name;
+	SQInteger i;
+	SQInteger nliterals;
+	SQInteger nparameters;
+	SQInteger noutervalues;
+	SQInteger nlocalvarinfos;
+	SQInteger nlineinfos;
+	SQInteger ninstructions;
+	SQInteger nfunctions;
+	SQInteger ndefaultparams;
+	SQObjectPtr sourcename;
+	SQObjectPtr name;
 	SQObjectPtr o;
 	_CHECK_IO(CheckTag(v, read, up, SQ_CLOSURESTREAM_PART));
 	_CHECK_IO(ReadObject(v, up, read, sourcename));

@@ -1585,7 +1585,10 @@ SQRESULT sq_getdefaultdelegate(HSQUIRRELVM v, SQObjectType t) {
 }
 
 SQRESULT sq_next(HSQUIRRELVM v, SQInteger idx) {
-	SQObjectPtr o = stack_get(v, idx), &refpos = stack_get(v, -1), realkey, val;
+	SQObjectPtr o = stack_get(v, idx);
+	SQObjectPtr &refpos = stack_get(v, -1);
+	SQObjectPtr realkey;
+	SQObjectPtr val;
 	if (sq_type(o) == OT_GENERATOR) {
 		return sq_throwerror(v, _SC("cannot iterate a generator"));
 	}

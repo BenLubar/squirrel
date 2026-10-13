@@ -21,8 +21,10 @@
 
 SQInteger _stream_readblob(HSQUIRRELVM v) {
 	SETUP_STREAM(v);
-	SQUserPointer data, blobp;
-	SQInteger size, res;
+	SQUserPointer data;
+	SQUserPointer blobp;
+	SQInteger size;
+	SQInteger res;
 	sq_getinteger(v, 2, &size);
 	if (size > self->Len()) {
 		size = self->Len();
@@ -110,7 +112,8 @@ SQInteger _stream_writeblob(HSQUIRRELVM v) {
 
 SQInteger _stream_writen(HSQUIRRELVM v) {
 	SETUP_STREAM(v);
-	SQInteger format, ti;
+	SQInteger format;
+	SQInteger ti;
 	SQFloat tf;
 	sq_getinteger(v, 3, &format);
 	switch (format) {
@@ -170,7 +173,8 @@ SQInteger _stream_writen(HSQUIRRELVM v) {
 
 SQInteger _stream_seek(HSQUIRRELVM v) {
 	SETUP_STREAM(v);
-	SQInteger offset, origin = SQ_SEEK_SET;
+	SQInteger offset;
+	SQInteger origin = SQ_SEEK_SET;
 	sq_getinteger(v, 2, &offset);
 	if (sq_gettop(v) > 2) {
 		SQInteger t;
