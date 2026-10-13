@@ -6,10 +6,10 @@
 #include <sqstdblob.h>
 #include <sqstdio.h>
 #include <squirrel.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <new>
 
 #define SETUP_STREAM(v) \

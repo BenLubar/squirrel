@@ -1,9 +1,10 @@
 /* see copyright notice in squirrel.h */
-#include <assert.h>
 #include <sqstdaux.h>
 #include <squirrel.h>
-#include <stdarg.h>
-#include <stdio.h>
+
+#include <cassert>
+#include <cstdarg>
+#include <cstdio>
 
 void sqstd_printcallstack(HSQUIRRELVM v) {
 	SQPRINTFUNCTION pf = sq_geterrorfunc(v);

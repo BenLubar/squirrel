@@ -3,8 +3,8 @@
 
 #include <sqstdio.h>
 #include <squirrel.h>
-#include <stdio.h>
 
+#include <cstdio>
 #include <new>
 
 #define SQSTD_FILE_TYPE_TAG ((SQUnsignedInteger)(SQSTD_STREAM_TYPE_TAG | 0x00000001))

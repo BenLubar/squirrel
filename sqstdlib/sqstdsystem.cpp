@@ -1,9 +1,10 @@
 /* see copyright notice in squirrel.h */
 #include <sqstdsystem.h>
 #include <squirrel.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
 #if defined(__APPLE__) && !defined(IOS)
 #include <TargetConditionals.h>

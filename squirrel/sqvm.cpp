@@ -13,8 +13,8 @@
 #include "sqtable.h"
 #include "squserdata.h"
 
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 
 #define TOP() (_stack._vals[_top - 1])
 #define TARGET _stack._vals[_stackbase + arg0]
@@ -297,7 +297,7 @@ bool SQVM::ObjCmp(const SQObjectPtr &o1, const SQObjectPtr &o2, SQInteger &resul
 	SQObjectType t1 = sq_type(o1);
 	SQObjectType t2 = sq_type(o2);
 	alwaysfalse = false;
-	if ((t1 == OT_FLOAT && isnan(_float(o1))) || (t2 == OT_FLOAT && isnan(_float(o2)))) {
+	if ((t1 == OT_FLOAT && std::isnan(_float(o1))) || (t2 == OT_FLOAT && std::isnan(_float(o2)))) {
 		alwaysfalse = true;
 		_RET_SUCCEED(0);
 	}
@@ -322,7 +322,7 @@ bool SQVM::ObjCmp(const SQObjectPtr &o1, const SQObjectPtr &o2, SQInteger &resul
 						Push(o1);
 						Push(o2);
 						if (CallMetaMethod(closure, MT_CMP, 2, res)) {
-							if (sq_type(res) == OT_FLOAT && isnan(_float(res))) {
+							if (sq_type(res) == OT_FLOAT && std::isnan(_float(res))) {
 								alwaysfalse = true;
 								_RET_SUCCEED(0);
 							}

@@ -1,9 +1,10 @@
 /* see copyright notice in squirrel.h */
-#include <ctype.h>
-#include <setjmp.h>
 #include <sqstdstring.h>
 #include <squirrel.h>
-#include <string.h>
+
+#include <cctype>
+#include <csetjmp>
+#include <cstring>
 
 #ifdef _DEBUG
 #include <stdio.h>

@@ -8,8 +8,8 @@
 #include "sqstring.h"
 #include "sqtable.h"
 
-#include <ctype.h>
-#include <stdlib.h>
+#include <cctype>
+#include <cstdlib>
 
 #define CUR_CHAR (_currdata)
 #define RETURN_TOKEN(t) \

@@ -1,8 +1,9 @@
 /* see copyright notice in squirrel.h */
-#include <math.h>
 #include <sqstdmath.h>
 #include <squirrel.h>
-#include <stdlib.h>
+
+#include <cmath>
+#include <cstdlib>
 
 #define SINGLE_ARG_FUNC(_funcname) \
 	static SQInteger math_##_funcname(HSQUIRRELVM v) { \

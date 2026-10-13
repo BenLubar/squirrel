@@ -10,9 +10,9 @@
 #include "sqtable.h"
 #include "sqvm.h"
 
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdlib.h>
+#include <cctype>
+#include <cstdarg>
+#include <cstdlib>
 
 static bool str2num(const SQChar *s, SQObjectPtr &res, SQInteger base) {
 	SQChar *end;

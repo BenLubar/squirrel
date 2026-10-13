@@ -12,8 +12,8 @@
 #include "sqtable.h"
 #include "sqvm.h"
 
-#include <setjmp.h>
-#include <stdarg.h>
+#include <csetjmp>
+#include <cstdarg>
 
 #define EXPR 1
 #define OBJECT 2

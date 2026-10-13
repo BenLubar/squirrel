@@ -7,7 +7,7 @@
 #include "sqstring.h"
 #include "sqvm.h"
 
-#include <stdarg.h>
+#include <cstdarg>
 
 SQRESULT sq_getfunctioninfo(HSQUIRRELVM v, SQInteger level, SQFunctionInfo *fi) {
 	SQInteger cssize = v->_callsstacksize;

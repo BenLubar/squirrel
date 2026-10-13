@@ -1,12 +1,13 @@
 /* see copyright notice in squirrel.h */
-#include <assert.h>
-#include <ctype.h>
 #include <sqstdstring.h>
 #include <squirrel.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
+#include <cassert>
+#include <cctype>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #define MAX_FORMAT_LEN 20
 #define MAX_WFORMAT_LEN 3
