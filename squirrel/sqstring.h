@@ -1,6 +1,8 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include "sqobject.h"
+
 inline SQHash _hashstr(const SQChar *s, size_t l) {
 	SQHash h = (SQHash)l; /* seed */
 	size_t step = (l >> 5) + 1; /* if string is too long, don't hash all its chars */

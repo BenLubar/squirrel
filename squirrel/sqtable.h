@@ -6,7 +6,11 @@
  * http://www.lua.org/source/4.0.1/src_ltable.c.html
  */
 
+#include "sqstate.h"
 #include "sqstring.h"
+
+#include <cstring>
+#include <new>
 
 #define hashptr(p) ((SQHash)(((SQInteger)p) >> 3))
 

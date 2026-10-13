@@ -1,6 +1,8 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include <squirrel.h>
+
 #ifdef __cplusplus
 
 #define SQSTD_STREAM_TYPE_TAG 0x80000000

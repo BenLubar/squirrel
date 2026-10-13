@@ -1,6 +1,10 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include "sqstdio.h"
+
+#include <cstring>
+
 struct SQBlob : public SQStream {
 	SQBlob(SQInteger size) {
 		_size = size;

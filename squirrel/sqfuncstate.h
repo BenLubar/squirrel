@@ -1,6 +1,10 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
-///////////////////////////////////
+
+#include "sqcompiler.h"
+#include "sqfuncproto.h"
+#include "sqopcodes.h"
+#include "sqstate.h"
 #include "squtils.h"
 
 struct SQFuncState {

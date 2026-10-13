@@ -1,6 +1,11 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include "sqobject.h"
+#include "sqtable.h"
+
+#include <new>
+
 struct SQInstance;
 
 struct SQClassMember {

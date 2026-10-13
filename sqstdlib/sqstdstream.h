@@ -1,6 +1,8 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include <squirrel.h>
+
 SQInteger _stream_readblob(HSQUIRRELVM v);
 SQInteger _stream_readline(HSQUIRRELVM v);
 SQInteger _stream_readn(HSQUIRRELVM v);

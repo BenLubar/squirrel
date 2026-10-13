@@ -1,6 +1,13 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include <squirrel.h>
+
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <new> // IWYU pragma: keep // used in macro
+
 void *sq_vm_malloc(SQUnsignedInteger size);
 void *sq_vm_realloc(void *p, SQUnsignedInteger oldsize, SQUnsignedInteger size);
 void sq_vm_free(void *p, SQUnsignedInteger size);

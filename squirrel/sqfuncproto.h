@@ -1,7 +1,10 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include "sqobject.h"
 #include "sqopcodes.h"
+
+#include <new>
 
 enum SQOuterType {
 	otLOCAL = 0,

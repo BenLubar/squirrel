@@ -1,6 +1,10 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include "sqfuncproto.h"
+#include "sqstate.h"
+#include "sqvm.h"
+
 #define _CALC_CLOSURE_SIZE(func) (sizeof(SQClosure) + (func->_noutervalues * sizeof(SQObjectPtr)) + (func->_ndefaultparams * sizeof(SQObjectPtr)))
 
 struct SQFunctionProto;

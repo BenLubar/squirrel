@@ -1,6 +1,10 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include "sqobject.h"
+
+#include <squirrel.h>
+
 struct SQVM;
 
 #define TK_IDENTIFIER 258

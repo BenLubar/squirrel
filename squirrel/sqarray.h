@@ -1,6 +1,12 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include "sqobject.h"
+#include "sqstate.h"
+#include "sqvm.h"
+
+#include <new>
+
 struct SQArray : public CHAINABLE_OBJ {
 private:
 	SQArray(SQSharedState *ss, SQInteger nsize) {

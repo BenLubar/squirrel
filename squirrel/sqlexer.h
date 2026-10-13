@@ -1,6 +1,9 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include "sqcompiler.h"
+#include "sqstate.h"
+
 #ifdef SQUNICODE
 typedef SQChar LexChar;
 #else

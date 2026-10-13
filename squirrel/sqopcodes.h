@@ -1,6 +1,8 @@
 /*  see copyright notice in squirrel.h */
 #pragma once
 
+#include <squirrel.h>
+
 #define MAX_FUNC_STACKSIZE 0xFF
 #define MAX_LITERALS ((SQInteger)0x7FFFFFFF)
 
