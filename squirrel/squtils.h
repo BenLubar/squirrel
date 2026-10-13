@@ -43,7 +43,7 @@ public:
 	}
 	void copy(const sqvector<T> &v) {
 		assert(this != &v);
-		if (_size) {
+		if (_size != 0u) {
 			resize(0); //destroys all previous stuff
 		}
 		//resize(v._size);
@@ -56,7 +56,7 @@ public:
 		_size = v._size;
 	}
 	~sqvector() {
-		if (_allocated) {
+		if (_allocated != 0u) {
 			for (SQUnsignedInteger i = 0; i < _size; i++) {
 				_vals[i].~T();
 			}

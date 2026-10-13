@@ -120,7 +120,7 @@ SQTable *CreateDefaultDelegate(SQSharedState *ss, const SQRegFunction *funcz) {
 		nc->_nparamscheckmin = funcz[i].nparamscheckmin;
 		nc->_nparamscheckmax = funcz[i].nparamscheckmax;
 		nc->_name = SQString::Create(ss, funcz[i].name);
-		if (funcz[i].typemask && !CompileTypemask(nc->_typecheck, funcz[i].typemask)) {
+		if ((funcz[i].typemask != nullptr) && !CompileTypemask(nc->_typecheck, funcz[i].typemask)) {
 			return nullptr;
 		}
 		t->NewSlot(SQString::Create(ss, funcz[i].name), nc);
@@ -194,7 +194,7 @@ void SQSharedState::Init() {
 }
 
 SQSharedState::~SQSharedState() {
-	if (_releasehook) {
+	if (_releasehook != nullptr) {
 		_releasehook(_foreignptr, 0);
 		_releasehook = nullptr;
 	}
@@ -225,12 +225,12 @@ SQSharedState::~SQSharedState() {
 #ifndef NO_GARBAGE_COLLECTOR
 	SQCollectable *t = _gc_chain;
 	SQCollectable *nx = nullptr;
-	if (t) {
+	if (t != nullptr) {
 		t->_uiRef++;
-		while (t) {
+		while (t != nullptr) {
 			t->Finalize();
 			nx = t->_next;
-			if (nx) {
+			if (nx != nullptr) {
 				nx->_uiRef++;
 			}
 			if (--t->_uiRef == 0) {
@@ -240,7 +240,7 @@ SQSharedState::~SQSharedState() {
 		}
 	}
 	assert(_gc_chain == NULL); //just to proove a theory
-	while (_gc_chain) {
+	while (_gc_chain != nullptr) {
 		_gc_chain->_uiRef++;
 		_gc_chain->Release();
 	}
@@ -250,7 +250,7 @@ SQSharedState::~SQSharedState() {
 	sq_delete(_systemstrings, SQObjectPtrVec);
 	sq_delete(_metamethods, SQObjectPtrVec);
 	sq_delete(_stringtable, SQStringTable);
-	if (_scratchpad) {
+	if (_scratchpad != nullptr) {
 		SQ_FREE(_scratchpad, _scratchpadsize);
 	}
 }
@@ -341,10 +341,10 @@ SQInteger SQSharedState::ResurrectUnreachable(SQVM *vm) {
 	_gc_chain = tchain;
 
 	SQArray *ret = nullptr;
-	if (resurrected) {
+	if (resurrected != nullptr) {
 		ret = SQArray::Create(this, 0);
 		SQCollectable *rlast = nullptr;
-		while (t) {
+		while (t != nullptr) {
 			rlast = t;
 			SQObjectType type = t->GetType();
 			if (type != OT_FUNCPROTO && type != OT_OUTER) {
@@ -359,19 +359,19 @@ SQInteger SQSharedState::ResurrectUnreachable(SQVM *vm) {
 
 		assert(rlast->_next == NULL);
 		rlast->_next = _gc_chain;
-		if (_gc_chain) {
+		if (_gc_chain != nullptr) {
 			_gc_chain->_prev = rlast;
 		}
 		_gc_chain = resurrected;
 	}
 
 	t = _gc_chain;
-	while (t) {
+	while (t != nullptr) {
 		t->UnMark();
 		t = t->_next;
 	}
 
-	if (ret) {
+	if (ret != nullptr) {
 		SQObjectPtr temp = ret;
 		vm->Push(temp);
 	} else {
@@ -388,12 +388,12 @@ SQInteger SQSharedState::CollectGarbage(SQVM *vm) {
 
 	SQCollectable *t = _gc_chain;
 	SQCollectable *nx = nullptr;
-	if (t) {
+	if (t != nullptr) {
 		t->_uiRef++;
-		while (t) {
+		while (t != nullptr) {
 			t->Finalize();
 			nx = t->_next;
-			if (nx) {
+			if (nx != nullptr) {
 				nx->_uiRef++;
 			}
 			if (--t->_uiRef == 0) {
@@ -405,7 +405,7 @@ SQInteger SQSharedState::CollectGarbage(SQVM *vm) {
 	}
 
 	t = tchain;
-	while (t) {
+	while (t != nullptr) {
 		t->UnMark();
 		t = t->_next;
 	}
@@ -419,19 +419,19 @@ SQInteger SQSharedState::CollectGarbage(SQVM *vm) {
 void SQCollectable::AddToChain(SQCollectable **chain, SQCollectable *c) {
 	c->_prev = nullptr;
 	c->_next = *chain;
-	if (*chain) {
+	if ((*chain) != nullptr) {
 		(*chain)->_prev = c;
 	}
 	*chain = c;
 }
 
 void SQCollectable::RemoveFromChain(SQCollectable **chain, SQCollectable *c) {
-	if (c->_prev) {
+	if (c->_prev != nullptr) {
 		c->_prev->_next = c->_next;
 	} else {
 		*chain = c->_next;
 	}
-	if (c->_next) {
+	if (c->_next != nullptr) {
 		c->_next->_prev = c->_prev;
 	}
 	c->_next = nullptr;
@@ -497,7 +497,7 @@ SQUnsignedInteger RefTable::GetRefCount(SQObject &obj) {
 	SQHash mainpos;
 	RefNode *prev;
 	RefNode *ref = Get(obj, mainpos, &prev, false);
-	if (ref) {
+	if (ref != nullptr) {
 		return ref->refs;
 	}
 	return 0;
@@ -507,10 +507,10 @@ SQBool RefTable::Release(SQObject &obj) {
 	SQHash mainpos;
 	RefNode *prev;
 	RefNode *ref = Get(obj, mainpos, &prev, false);
-	if (ref) {
+	if (ref != nullptr) {
 		if (--ref->refs == 0) {
 			SQObjectPtr o = ref->obj;
-			if (prev) {
+			if (prev != nullptr) {
 				prev->next = ref->next;
 			} else {
 				_buckets[mainpos] = ref->next;
@@ -566,7 +566,7 @@ RefTable::RefNode *RefTable::Get(SQObject &obj, SQHash &mainpos, RefNode **prev,
 	RefNode *ref;
 	mainpos = ::HashObj(obj) & (_numofslots - 1);
 	*prev = nullptr;
-	for (ref = _buckets[mainpos]; ref;) {
+	for (ref = _buckets[mainpos]; ref != nullptr;) {
 		if (_rawval(ref->obj) == _rawval(obj) && sq_type(ref->obj) == sq_type(obj)) {
 			break;
 		}
@@ -638,9 +638,9 @@ SQString *SQStringTable::Concat(const SQChar *a, SQInteger alen, const SQChar *b
 	SQHash h = newhash & (_numofslots - 1);
 	SQString *s;
 	SQInteger len = alen + blen;
-	for (s = _strings[h]; s; s = s->_next) {
+	for (s = _strings[h]; s != nullptr; s = s->_next) {
 		if (s->_len == len) {
-			if ((!memcmp(a, s->_val, sq_rsl(alen))) && (!memcmp(b, &s->_val[alen], sq_rsl(blen)))) {
+			if ((memcmp(a, s->_val, sq_rsl(alen)) == 0) && (memcmp(b, &s->_val[alen], sq_rsl(blen)) == 0)) {
 				return s; //found
 			}
 		}
@@ -674,8 +674,8 @@ SQString *SQStringTable::Add(const SQChar *news, SQInteger len) {
 	SQHash newhash = ::_hashstr(news, len);
 	SQHash h = newhash & (_numofslots - 1);
 	SQString *s;
-	for (s = _strings[h]; s; s = s->_next) {
-		if (s->_len == len && (!memcmp(news, s->_val, sq_rsl(len)))) {
+	for (s = _strings[h]; s != nullptr; s = s->_next) {
+		if (s->_len == len && (memcmp(news, s->_val, sq_rsl(len)) == 0)) {
 			return s; //found
 		}
 	}
@@ -702,7 +702,7 @@ void SQStringTable::Resize(SQInteger size) {
 	AllocNodes(size);
 	for (SQInteger i = 0; i < oldsize; i++) {
 		SQString *p = oldtable[i];
-		while (p) {
+		while (p != nullptr) {
 			SQString *next = p->_next;
 			SQHash h = p->_hash & (_numofslots - 1);
 			p->_next = _strings[h];
@@ -718,9 +718,9 @@ void SQStringTable::Remove(SQString *bs) {
 	SQString *prev = nullptr;
 	SQHash h = bs->_hash & (_numofslots - 1);
 
-	for (s = _strings[h]; s;) {
+	for (s = _strings[h]; s != nullptr;) {
 		if (s == bs) {
-			if (prev) {
+			if (prev != nullptr) {
 				prev->_next = s->_next;
 			} else {
 				_strings[h] = s->_next;

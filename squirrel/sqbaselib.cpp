@@ -111,10 +111,10 @@ static SQInteger __getcallstackinfos(HSQUIRRELVM v, SQInteger level) {
 	if (SQ_SUCCEEDED(sq_stackinfos(v, level, &si))) {
 		const SQChar *fn = _SC("unknown");
 		const SQChar *src = _SC("unknown");
-		if (si.funcname) {
+		if (si.funcname != nullptr) {
 			fn = si.funcname;
 		}
-		if (si.source) {
+		if (si.source != nullptr) {
 			src = si.source;
 		}
 		sq_newtable(v);
@@ -130,7 +130,7 @@ static SQInteger __getcallstackinfos(HSQUIRRELVM v, SQInteger level) {
 		sq_pushstring(v, _SC("locals"), -1);
 		sq_newtable(v);
 		seq = 0;
-		while ((name = sq_getlocal(v, level, seq))) {
+		while ((name = sq_getlocal(v, level, seq)) != nullptr) {
 			sq_pushstring(v, name, -1);
 			sq_push(v, -2);
 			sq_newslot(v, -4, SQFalse);
@@ -789,7 +789,7 @@ static bool _hsort_sift_down(HSQUIRRELVM v, SQArray *arr, SQInteger root, SQInte
 	SQInteger done = 0;
 	SQInteger ret;
 	SQInteger root2;
-	while (((root2 = root * 2) <= bottom) && (!done)) {
+	while (((root2 = root * 2) <= bottom) && (done == 0)) {
 		if (root2 == bottom) {
 			maxChild = root2;
 		} else {
@@ -947,7 +947,7 @@ static SQInteger string_find(HSQUIRRELVM v) {
 		}
 		if ((sq_getsize(v, 1) > start_idx) && (start_idx >= 0)) {
 			ret = scstrstr(&str[start_idx], substr);
-			if (ret) {
+			if (ret != nullptr) {
 				sq_pushinteger(v, (SQInteger)(ret - str));
 				return 1;
 			}
@@ -1065,7 +1065,7 @@ static SQInteger closure_getinfos(HSQUIRRELVM v) {
 	SQTable *res = SQTable::Create(_ss(v), 4);
 	if (sq_type(o) == OT_CLOSURE) {
 		SQFunctionProto *f = _closure(o)->_function;
-		SQInteger nparams = f->_nparameters + (f->_varparams ? 1 : 0);
+		SQInteger nparams = f->_nparameters + ((f->_varparams != 0) ? 1 : 0);
 		SQObjectPtr params = SQArray::Create(_ss(v), nparams);
 		SQObjectPtr defparams = SQArray::Create(_ss(v), f->_ndefaultparams);
 		for (SQInteger n = 0; n < f->_nparameters; n++) {
@@ -1074,7 +1074,7 @@ static SQInteger closure_getinfos(HSQUIRRELVM v) {
 		for (SQInteger j = 0; j < f->_ndefaultparams; j++) {
 			_array(defparams)->Set((SQInteger)j, _closure(o)->_defaultparams[j]);
 		}
-		if (f->_varparams) {
+		if (f->_varparams != 0) {
 			_array(params)->Set(nparams - 1, SQString::Create(_ss(v), _SC("..."), -1));
 		}
 		res->NewSlot(SQString::Create(_ss(v), _SC("native"), -1), false);
@@ -1179,7 +1179,7 @@ static SQInteger thread_wakeup(HSQUIRRELVM v) {
 		}
 
 		SQInteger wakeupret = sq_gettop(v) > 1 ? SQTrue : SQFalse;
-		if (wakeupret) {
+		if (wakeupret != 0) {
 			sq_move(thread, v, 2);
 		}
 		if (SQ_SUCCEEDED(sq_wakeupvm(thread, wakeupret, SQTrue, SQTrue, SQFalse))) {
@@ -1228,7 +1228,7 @@ static SQInteger thread_wakeupthrow(HSQUIRRELVM v) {
 			return 1;
 		}
 		sq_settop(thread, 1);
-		if (rethrow_error) {
+		if (rethrow_error != 0u) {
 			v->_lasterror = thread->_lasterror;
 			return SQ_ERROR;
 		}

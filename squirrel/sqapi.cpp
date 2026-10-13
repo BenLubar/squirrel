@@ -78,7 +78,7 @@ HSQUIRRELVM sq_newthread(HSQUIRRELVM friendvm, SQInteger initialstacksize) {
 }
 
 SQInteger sq_getvmstate(HSQUIRRELVM v) {
-	if (v->_suspended) {
+	if (v->_suspended != 0u) {
 		return SQ_VMSTATE_SUSPENDED;
 	} else {
 		if (v->_callsstacksize != 0) {
@@ -100,7 +100,7 @@ void sq_seterrorhandler(HSQUIRRELVM v) {
 void sq_setnativedebughook(HSQUIRRELVM v, SQDEBUGHOOK hook) {
 	v->_debughook_native = hook;
 	v->_debughook_closure.Null();
-	v->_debughook = hook ? true : false;
+	v->_debughook = (hook != nullptr) ? true : false;
 }
 
 void sq_setdebughook(HSQUIRRELVM v) {
@@ -126,7 +126,7 @@ SQInteger sq_getversion() {
 SQRESULT sq_compile(HSQUIRRELVM v, SQLEXREADFUNC read, SQUserPointer p, const SQChar *sourcename, SQBool raiseerror) {
 	SQObjectPtr o;
 #ifndef NO_COMPILER
-	if (Compile(v, read, p, sourcename, o, raiseerror ? true : false, _ss(v)->_debuginfo)) {
+	if (Compile(v, read, p, sourcename, o, (raiseerror != 0u) ? true : false, _ss(v)->_debuginfo)) {
 		v->Push(SQClosure::Create(_ss(v), _funcproto(o), _table(v->_roottable)->GetWeakRef(OT_TABLE)));
 		return SQ_OK;
 	}
@@ -137,11 +137,11 @@ SQRESULT sq_compile(HSQUIRRELVM v, SQLEXREADFUNC read, SQUserPointer p, const SQ
 }
 
 void sq_enabledebuginfo(HSQUIRRELVM v, SQBool enable) {
-	_ss(v)->_debuginfo = enable ? true : false;
+	_ss(v)->_debuginfo = (enable != 0u) ? true : false;
 }
 
 void sq_notifyallexceptions(HSQUIRRELVM v, SQBool enable) {
-	_ss(v)->_notifyallexceptions = enable ? true : false;
+	_ss(v)->_notifyallexceptions = (enable != 0u) ? true : false;
 }
 
 void sq_addref(HSQUIRRELVM v, HSQOBJECT *po) {
@@ -226,7 +226,7 @@ void sq_pushnull(HSQUIRRELVM v) {
 }
 
 void sq_pushstring(HSQUIRRELVM v, const SQChar *s, SQInteger len) {
-	if (s) {
+	if (s != nullptr) {
 		v->Push(SQObjectPtr(SQString::Create(_ss(v), s, len)));
 	} else {
 		v->PushNull();
@@ -238,7 +238,7 @@ void sq_pushinteger(HSQUIRRELVM v, SQInteger n) {
 }
 
 void sq_pushbool(HSQUIRRELVM v, SQBool b) {
-	v->Push(b ? true : false);
+	v->Push((b != 0u) ? true : false);
 }
 
 void sq_pushfloat(HSQUIRRELVM v, SQFloat n) {
@@ -273,7 +273,7 @@ void sq_newarray(HSQUIRRELVM v, SQInteger size) {
 
 SQRESULT sq_newclass(HSQUIRRELVM v, SQBool hasbase) {
 	SQClass *baseclass = nullptr;
-	if (hasbase) {
+	if (hasbase != 0u) {
 		SQObjectPtr &base = stack_get(v, -1);
 		if (sq_type(base) != OT_CLASS) {
 			return sq_throwerror(v, _SC("invalid base type"));
@@ -281,7 +281,7 @@ SQRESULT sq_newclass(HSQUIRRELVM v, SQBool hasbase) {
 		baseclass = _class(base);
 	}
 	SQClass *newclass = SQClass::Create(_ss(v), baseclass);
-	if (baseclass) {
+	if (baseclass != nullptr) {
 		v->Pop();
 	}
 	v->Push(newclass);
@@ -413,7 +413,7 @@ SQRESULT sq_setparamscheck(HSQUIRRELVM v, SQInteger nparamscheckmin, SQInteger n
 		return sq_throwerror(v, _SC("native closure expected"));
 	}
 	SQNativeClosure *nc = _nativeclosure(o);
-	if (typemask) {
+	if (typemask != nullptr) {
 		SQIntVec res;
 		if (!CompileTypemask(res, typemask)) {
 			return sq_throwerror(v, _SC("invalid typemask"));
@@ -707,7 +707,7 @@ SQRESULT sq_getuserdata(HSQUIRRELVM v, SQInteger idx, SQUserPointer *p, SQUserPo
 	SQObjectPtr *o = nullptr;
 	_GETSAFE_OBJ(v, idx, OT_USERDATA, o);
 	(*p) = _userdataval(*o);
-	if (typetag) {
+	if (typetag != nullptr) {
 		*typetag = _userdata(*o)->_typetag;
 	}
 	return SQ_OK;
@@ -784,7 +784,7 @@ SQRESULT sq_setclassudsize(HSQUIRRELVM v, SQInteger idx, SQInteger udsize) {
 SQRESULT sq_getinstanceup(HSQUIRRELVM v, SQInteger idx, SQUserPointer *p, SQUserPointer typetag, SQBool throwerror) {
 	SQObjectPtr &o = stack_get(v, idx);
 	if (sq_type(o) != OT_INSTANCE) {
-		return throwerror ? sq_throwerror(v, _SC("the object is not a class instance")) : SQ_ERROR;
+		return (throwerror != 0u) ? sq_throwerror(v, _SC("the object is not a class instance")) : SQ_ERROR;
 	}
 	(*p) = _instance(o)->_userpointer;
 	if (typetag != nullptr) {
@@ -795,7 +795,7 @@ SQRESULT sq_getinstanceup(HSQUIRRELVM v, SQInteger idx, SQUserPointer *p, SQUser
 			}
 			cl = cl->_base;
 		} while (cl != nullptr);
-		return throwerror ? sq_throwerror(v, _SC("invalid type tag")) : SQ_ERROR;
+		return (throwerror != 0u) ? sq_throwerror(v, _SC("invalid type tag")) : SQ_ERROR;
 	}
 	return SQ_OK;
 }
@@ -837,7 +837,7 @@ SQInteger sq_cmp(HSQUIRRELVM v) {
 }
 
 SQRESULT sq_cmpex(HSQUIRRELVM v, SQInteger *res, SQBool *alwaysfalse) {
-	if (!res || !alwaysfalse) {
+	if ((res == nullptr) || (alwaysfalse == nullptr)) {
 		return SQ_ERROR;
 	}
 	bool af;
@@ -854,7 +854,7 @@ SQRESULT sq_newslot(HSQUIRRELVM v, SQInteger idx, SQBool bstatic) {
 		if (sq_type(key) == OT_NULL) {
 			return sq_throwerror(v, _SC("null is not a valid key"));
 		}
-		v->NewSlot(self, key, v->GetUp(-1), bstatic ? true : false);
+		v->NewSlot(self, key, v->GetUp(-1), (bstatic != 0u) ? true : false);
 		v->Pop(2);
 	}
 	return SQ_OK;
@@ -873,7 +873,7 @@ SQRESULT sq_deleteslot(HSQUIRRELVM v, SQInteger idx, SQBool pushval) {
 		v->Pop();
 		return SQ_ERROR;
 	}
-	if (pushval) {
+	if (pushval != 0u) {
 		v->GetUp(-1) = res;
 	} else {
 		v->Pop();
@@ -915,7 +915,7 @@ SQRESULT sq_rawset(HSQUIRRELVM v, SQInteger idx) {
 			}
 			break;
 		case OT_ARRAY:
-			if (v->Set(self, key, v->GetUp(-1), false)) {
+			if (v->Set(self, key, v->GetUp(-1), 0)) {
 				v->Pop(2);
 				return SQ_OK;
 			}
@@ -937,7 +937,7 @@ SQRESULT sq_newmember(HSQUIRRELVM v, SQInteger idx, SQBool bstatic) {
 	if (sq_type(key) == OT_NULL) {
 		return sq_throwerror(v, _SC("null key"));
 	}
-	if (!v->NewSlotA(self, key, v->GetUp(-2), v->GetUp(-1), bstatic ? true : false, false)) {
+	if (!v->NewSlotA(self, key, v->GetUp(-2), v->GetUp(-1), (bstatic != 0u) ? true : false, false)) {
 		v->Pop(3);
 		return SQ_ERROR;
 	}
@@ -954,7 +954,7 @@ SQRESULT sq_rawnewmember(HSQUIRRELVM v, SQInteger idx, SQBool bstatic) {
 	if (sq_type(key) == OT_NULL) {
 		return sq_throwerror(v, _SC("null key"));
 	}
-	if (!v->NewSlotA(self, key, v->GetUp(-2), v->GetUp(-1), bstatic ? true : false, true)) {
+	if (!v->NewSlotA(self, key, v->GetUp(-2), v->GetUp(-1), (bstatic != 0u) ? true : false, true)) {
 		v->Pop(3);
 		return SQ_ERROR;
 	}
@@ -1036,7 +1036,7 @@ SQRESULT sq_getdelegate(HSQUIRRELVM v, SQInteger idx) {
 SQRESULT sq_get(HSQUIRRELVM v, SQInteger idx) {
 	SQObjectPtr &self = stack_get(v, idx);
 	SQObjectPtr &obj = v->GetUp(-1);
-	if (v->Get(self, obj, obj, false, DONT_FALL_BACK)) {
+	if (v->Get(self, obj, obj, 0u, DONT_FALL_BACK)) {
 		return SQ_OK;
 	}
 	v->Pop();
@@ -1165,7 +1165,7 @@ void sq_getlasterror(HSQUIRRELVM v) {
 
 SQRESULT sq_reservestack(HSQUIRRELVM v, SQInteger nsize) {
 	if (((SQUnsignedInteger)v->_top + nsize) > v->_stack.size()) {
-		if (v->_nmetamethodscall) {
+		if (v->_nmetamethodscall != 0) {
 			return sq_throwerror(v, _SC("cannot resize stack while in a metamethod"));
 		}
 		v->_stack.resize(v->_stack.size() + ((v->_top + nsize) - v->_stack.size()));
@@ -1180,7 +1180,7 @@ SQRESULT sq_resume(HSQUIRRELVM v, SQBool retval, SQBool raiseerror) {
 			v->Raise_Error(v->_lasterror);
 			return SQ_ERROR;
 		}
-		if (!retval) {
+		if (retval == 0u) {
 			v->Pop();
 		}
 		return SQ_OK;
@@ -1190,14 +1190,14 @@ SQRESULT sq_resume(HSQUIRRELVM v, SQBool retval, SQBool raiseerror) {
 
 SQRESULT sq_call(HSQUIRRELVM v, SQInteger params, SQBool retval, SQBool raiseerror) {
 	SQObjectPtr res;
-	if (!v->Call(v->GetUp(-(params + 1)), params, v->_top - params, res, raiseerror ? true : false)) {
+	if (!v->Call(v->GetUp(-(params + 1)), params, v->_top - params, res, (static_cast<SQBool>(raiseerror != 0u) ? true : false))) {
 		v->Pop(params); //pop args
 		return SQ_ERROR;
 	}
-	if (!v->_suspended) {
+	if (v->_suspended == 0u) {
 		v->Pop(params); //pop args
 	}
-	if (retval) {
+	if (retval != 0u) {
 		v->Push(res); // push result
 	}
 	return SQ_OK;
@@ -1226,11 +1226,11 @@ SQRESULT sq_suspendvm(HSQUIRRELVM v) {
 
 SQRESULT sq_wakeupvm(HSQUIRRELVM v, SQBool wakeupret, SQBool retval, SQBool raiseerror, SQBool throwerror) {
 	SQObjectPtr ret;
-	if (!v->_suspended) {
+	if (v->_suspended == 0u) {
 		return sq_throwerror(v, _SC("cannot resume a vm that is not running any code"));
 	}
 	SQInteger target = v->_suspended_target;
-	if (wakeupret) {
+	if (wakeupret != 0u) {
 		if (target != -1) {
 			v->GetAt(v->_stackbase + v->_suspended_target) = v->GetUp(-1); //retval
 		}
@@ -1239,10 +1239,10 @@ SQRESULT sq_wakeupvm(HSQUIRRELVM v, SQBool wakeupret, SQBool retval, SQBool rais
 		v->GetAt(v->_stackbase + v->_suspended_target).Null();
 	}
 	SQObjectPtr dummy;
-	if (!v->Execute(dummy, -1, -1, ret, raiseerror, throwerror ? SQVM::ET_RESUME_THROW_VM : SQVM::ET_RESUME_VM)) {
+	if (!v->Execute(dummy, -1, -1, ret, raiseerror, (throwerror != 0u) ? SQVM::ET_RESUME_THROW_VM : SQVM::ET_RESUME_VM)) {
 		return SQ_ERROR;
 	}
-	if (retval) {
+	if (retval != 0u) {
 		v->Push(ret);
 	}
 	return SQ_OK;
@@ -1457,7 +1457,7 @@ SQRESULT _getmemberbyhandle(HSQUIRRELVM v, SQObjectPtr &self, const HSQMEMBERHAN
 	switch (sq_type(self)) {
 		case OT_INSTANCE: {
 			SQInstance *i = _instance(self);
-			if (handle->_static) {
+			if (handle->_static != 0u) {
 				SQClass *c = i->_class;
 				val = &c->_methods[handle->_index].val;
 			} else {
@@ -1466,7 +1466,7 @@ SQRESULT _getmemberbyhandle(HSQUIRRELVM v, SQObjectPtr &self, const HSQMEMBERHAN
 		} break;
 		case OT_CLASS: {
 			SQClass *c = _class(self);
-			if (handle->_static) {
+			if (handle->_static != 0u) {
 				val = &c->_methods[handle->_index].val;
 			} else {
 				val = &c->_defaultvalues[handle->_index].val;

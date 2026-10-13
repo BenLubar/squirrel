@@ -52,7 +52,7 @@ public:
 		SQFunctionProto *f = _function;
 		SQClosure *ret = SQClosure::Create(_opt_ss(this), f, _root);
 		ret->_env = _env;
-		if (ret->_env) {
+		if (ret->_env != nullptr) {
 			__ObjAddRef(ret->_env);
 		}
 		_COPY_VECTOR(ret->_outervalues, _outervalues, f->_noutervalues);
@@ -189,7 +189,7 @@ public:
 	SQNativeClosure *Clone() {
 		SQNativeClosure *ret = SQNativeClosure::Create(_opt_ss(this), _function, _noutervalues);
 		ret->_env = _env;
-		if (ret->_env) {
+		if (ret->_env != nullptr) {
 			__ObjAddRef(ret->_env);
 		}
 		ret->_name = _name;

@@ -106,7 +106,7 @@ struct SQBlob : public SQStream {
 		return 0;
 	}
 	bool IsValid() {
-		return _size == 0 || _buf ? true : false;
+		return _size == 0 || (_buf != nullptr) ? true : false;
 	}
 	bool EOS() {
 		return _ptr == _size;

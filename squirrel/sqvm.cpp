@@ -165,7 +165,7 @@ bool SQVM::ARITH_OP(SQUnsignedInteger op, SQObjectPtr &trg, const SQObjectPtr &o
 			trg = res;
 		} break;
 		default:
-			if (op == '+' && (tmask & _RT_STRING)) {
+			if (op == '+' && ((tmask & _RT_STRING) != 0)) {
 				if (!StringCat(o1, o2, trg)) {
 					return false;
 				}
@@ -198,11 +198,11 @@ SQVM::SQVM(SQSharedState *ss) {
 }
 
 void SQVM::Finalize() {
-	if (_releasehook) {
+	if (_releasehook != nullptr) {
 		_releasehook(_foreignptr, 0);
 		_releasehook = nullptr;
 	}
-	if (_openouters) {
+	if (_openouters != nullptr) {
 		CloseOuters(&_stack._vals[0]);
 	}
 	_roottable.Null();
@@ -493,7 +493,7 @@ bool SQVM::Init(SQVM *friendvm, SQInteger stacksize) {
 	_callsstack = &_callstackdata[0];
 	_stackbase = 0;
 	_top = 0;
-	if (!friendvm) {
+	if (friendvm == nullptr) {
 		_roottable = SQTable::Create(_ss(this), 0);
 		sq_base_register(this);
 	} else {
@@ -513,7 +513,7 @@ bool SQVM::StartCall(SQClosure *closure, SQInteger target, SQInteger args, SQInt
 	SQInteger paramssize = func->_nparameters;
 	const SQInteger newtop = stackbase + func->_stacksize;
 	SQInteger nargs = args;
-	if (func->_varparams) {
+	if (func->_varparams != 0) {
 		paramssize--;
 		if (nargs < paramssize) {
 			Raise_Error(_SC("wrong number of parameters (%d passed, at least %d required)"),
@@ -535,7 +535,7 @@ bool SQVM::StartCall(SQClosure *closure, SQInteger target, SQInteger args, SQInt
 	} else if (paramssize != nargs) {
 		SQInteger ndef = func->_ndefaultparams;
 		SQInteger diff;
-		if (ndef && nargs < paramssize && (diff = paramssize - nargs) <= ndef) {
+		if ((ndef != 0) && nargs < paramssize && (diff = paramssize - nargs) <= ndef) {
 			for (SQInteger n = ndef - diff; n < ndef; n++) {
 				_stack._vals[stackbase + (nargs++)] = closure->_defaultparams[n];
 			}
@@ -546,7 +546,7 @@ bool SQVM::StartCall(SQClosure *closure, SQInteger target, SQInteger args, SQInt
 		}
 	}
 
-	if (closure->_env) {
+	if (closure->_env != nullptr) {
 		_stack._vals[stackbase] = closure->_env->_obj;
 	}
 
@@ -588,14 +588,14 @@ bool SQVM::Return(SQInteger _arg0, SQInteger _arg1, SQObjectPtr &retval) {
 	}
 
 	SQObjectPtr *dest;
-	if (_isroot) {
+	if (_isroot != 0u) {
 		dest = &(retval);
 	} else if (ci->_target == -1) {
 		dest = nullptr;
 	} else {
 		dest = &_stack._vals[callerbase + ci->_target];
 	}
-	if (dest) {
+	if (dest != nullptr) {
 		if (_arg0 != 0xFF) {
 			*dest = _stack._vals[_stackbase + _arg1];
 		} else {
@@ -604,7 +604,7 @@ bool SQVM::Return(SQInteger _arg0, SQInteger _arg1, SQObjectPtr &retval) {
 		//*dest = (_arg0 != 0xFF) ? _stack._vals[_stackbase+_arg1] : _null_;
 	}
 	LeaveFrame();
-	return _isroot ? true : false;
+	return (_isroot != 0u) ? true : false;
 }
 
 #define _RET_ON_FAIL(exp) \
@@ -647,7 +647,7 @@ bool SQVM::DerefInc(SQInteger op, SQObjectPtr &target, SQObjectPtr &self, SQObje
 #define sarg3 ((SQInteger) * ((const signed char *)&_i_._arg3))
 
 SQRESULT SQVM::Suspend() {
-	if (_suspended) {
+	if (_suspended != 0u) {
 		return sq_throwerror(this, _SC("cannot suspend an already suspended vm"));
 	}
 	if (_nnativecalls != 2) {
@@ -751,7 +751,7 @@ bool SQVM::FOREACH_OP(SQObjectPtr &o1, SQObjectPtr &o2, SQObjectPtr &o3, SQObjec
 bool SQVM::CLOSURE_OP(SQObjectPtr &target, SQFunctionProto *func, SQInteger boundtarget) {
 	SQInteger nouters;
 	SQClosure *closure = SQClosure::Create(_ss(this), func, _table(_roottable)->GetWeakRef(OT_TABLE));
-	if ((nouters = func->_noutervalues)) {
+	if ((nouters = func->_noutervalues) != 0) {
 		for (SQInteger i = 0; i < nouters; i++) {
 			SQOuterVar &v = func->_outervalues[i];
 			switch (v._type) {
@@ -765,7 +765,7 @@ bool SQVM::CLOSURE_OP(SQObjectPtr &target, SQFunctionProto *func, SQInteger boun
 		}
 	}
 	SQInteger ndefparams;
-	if ((ndefparams = func->_ndefaultparams)) {
+	if ((ndefparams = func->_ndefaultparams) != 0) {
 		for (SQInteger i = 0; i < ndefparams; i++) {
 			SQInteger spos = func->_defaultparams[i];
 			closure->_defaultparams[i] = _stack._vals[_stackbase + spos];
@@ -806,7 +806,7 @@ bool SQVM::CLASS_OP(SQObjectPtr &target, SQInteger baseclass, SQInteger attribut
 		SQObjectPtr ret;
 		Push(target);
 		Push(attrs);
-		if (!Call(_class(target)->_metamethods[MT_INHERITED], nparams, _top - nparams, ret, false)) {
+		if (!Call(_class(target)->_metamethods[MT_INHERITED], nparams, _top - nparams, ret, 0u)) {
 			Pop(nparams);
 			return false;
 		}
@@ -836,7 +836,7 @@ bool SQVM::IsEqual(const SQObjectPtr &o1, const SQObjectPtr &o2, bool &res) {
 }
 
 bool SQVM::IsFalse(SQObjectPtr &o) {
-	if (((sq_type(o) & SQOBJECT_CANBEFALSE) && (((sq_type(o) == OT_FLOAT) && (_float(o) == SQFloat(0.0)))))
+	if ((((sq_type(o) & SQOBJECT_CANBEFALSE) != 0) && (((sq_type(o) == OT_FLOAT) && (_float(o) == SQFloat(0.0)))))
 #if !defined(SQUSEDOUBLE) || (defined(SQUSEDOUBLE) && defined(_SQ64))
 			|| (_integer(o) == 0)) //OT_NULL|OT_INTEGER|OT_BOOL
 #else
@@ -928,7 +928,7 @@ exception_restore:
 					if (sq_type(t) == OT_CLOSURE && (!_closure(t)->_function->_bgenerator)) {
 						SQObjectPtr clo = t;
 						SQInteger last_top = _top;
-						if (_openouters) {
+						if (_openouters != nullptr) {
 							CloseOuters(&(_stack._vals[_stackbase]));
 						}
 						for (SQInteger i = 0; i < arg3; i++) {
@@ -1087,7 +1087,7 @@ exception_restore:
 					_GUARD(BW_OP(arg3, TARGET, STK(arg2), STK(arg1)));
 					continue;
 				case _OP_RETURN:
-					if ((ci)->_generator) {
+					if ((ci)->_generator != nullptr) {
 						(ci)->_generator->Kill();
 					}
 					if (Return(arg0, arg1, temp_reg)) {
@@ -1283,11 +1283,11 @@ exception_restore:
 					continue;
 				}
 				case _OP_YIELD: {
-					if (ci->_generator) {
+					if (ci->_generator != nullptr) {
 						if (sarg1 != MAX_FUNC_STACKSIZE) {
 							temp_reg = STK(arg1);
 						}
-						if (_openouters) {
+						if (_openouters != nullptr) {
 							CloseOuters(&_stack._vals[_stackbase]);
 						}
 						_GUARD(ci->_generator->Yield(this, arg2));
@@ -1356,7 +1356,7 @@ exception_restore:
 					continue;
 				case _OP_GETBASE: {
 					SQClosure *clo = _closure(ci->_closure);
-					if (clo->_base) {
+					if (clo->_base != nullptr) {
 						TARGET = clo->_base;
 					} else {
 						TARGET.Null();
@@ -1364,7 +1364,7 @@ exception_restore:
 					continue;
 				}
 				case _OP_CLOSE:
-					if (_openouters) {
+					if (_openouters != nullptr) {
 						CloseOuters(&(STK(arg1)));
 					}
 					continue;
@@ -1378,11 +1378,11 @@ exception_trap:
 		//      SQInteger n = 0;
 		SQInteger last_top = _top;
 
-		if (_ss(this)->_notifyallexceptions || (!traps && raiseerror)) {
+		if (_ss(this)->_notifyallexceptions || ((traps == 0) && (raiseerror != 0u))) {
 			CallErrorHandler(currerror);
 		}
 
-		while (ci) {
+		while (ci != nullptr) {
 			if (ci->_etraps > 0) {
 				SQExceptionTrap &et = _etraps.top();
 				ci->_ip = et._ip;
@@ -1403,10 +1403,10 @@ exception_trap:
 					CallDebugHook(_SC('r'));
 				}
 			}
-			if (ci->_generator) {
+			if (ci->_generator != nullptr) {
 				ci->_generator->Kill();
 			}
-			bool mustbreak = ci && ci->_root;
+			bool mustbreak = (ci != nullptr) && (ci->_root != 0u);
 			LeaveFrame();
 			if (mustbreak) {
 				break;
@@ -1441,10 +1441,10 @@ void SQVM::CallErrorHandler(SQObjectPtr &error) {
 void SQVM::CallDebugHook(SQInteger type, SQInteger forcedline) {
 	_debughook = false;
 	SQFunctionProto *func = _closure(ci->_closure)->_function;
-	if (_debughook_native) {
+	if (_debughook_native != nullptr) {
 		const SQChar *src = sq_type(func->_sourcename) == OT_STRING ? _stringval(func->_sourcename) : nullptr;
 		const SQChar *fname = sq_type(func->_name) == OT_STRING ? _stringval(func->_name) : nullptr;
-		SQInteger line = forcedline ? forcedline : func->GetLine(ci->_ip);
+		SQInteger line = (forcedline != 0) ? forcedline : func->GetLine(ci->_ip);
 		_debughook_native(this, type, src, line, fname);
 	} else {
 		SQObjectPtr temp_reg;
@@ -1452,7 +1452,7 @@ void SQVM::CallDebugHook(SQInteger type, SQInteger forcedline) {
 		Push(_roottable);
 		Push(type);
 		Push(func->_sourcename);
-		Push(forcedline ? forcedline : func->GetLine(ci->_ip));
+		Push((forcedline != 0) ? forcedline : func->GetLine(ci->_ip));
 		Push(func->_name);
 		Call(_debughook_closure, nparams, _top - nparams, temp_reg, SQFalse);
 		Pop(nparams);
@@ -1476,9 +1476,9 @@ bool SQVM::CallNative(SQNativeClosure *nclosure, SQInteger nargs, SQInteger newb
 
 	SQInteger tcs;
 	SQIntVec &tc = nclosure->_typecheck;
-	if ((tcs = tc.size())) {
+	if ((tcs = tc.size()) != 0) {
 		for (SQInteger i = 0; i < nargs && i < tcs; i++) {
-			if ((tc._vals[i] != -1) && !(sq_type(_stack._vals[newbase + i]) & tc._vals[i])) {
+			if ((tc._vals[i] != -1) && ((sq_type(_stack._vals[newbase + i]) & tc._vals[i]) == 0)) {
 				Raise_ParamTypeError(i, tc._vals[i], sq_type(_stack._vals[newbase + i]));
 				return false;
 			}
@@ -1495,7 +1495,7 @@ bool SQVM::CallNative(SQNativeClosure *nclosure, SQInteger nargs, SQInteger newb
 	for (SQInteger i = 0; i < outers; i++) {
 		_stack._vals[newbase + nargs + i] = nclosure->_outervalues[i];
 	}
-	if (nclosure->_env) {
+	if (nclosure->_env != nullptr) {
 		_stack._vals[newbase] = nclosure->_env->_obj;
 	}
 
@@ -1515,7 +1515,7 @@ bool SQVM::CallNative(SQNativeClosure *nclosure, SQInteger nargs, SQInteger newb
 		Raise_Error(_lasterror);
 		return false;
 	}
-	if (ret) {
+	if (ret != 0) {
 		retval = _stack._vals[_top - 1];
 	} else {
 		retval.Null();
@@ -1528,7 +1528,7 @@ bool SQVM::CallNative(SQNativeClosure *nclosure, SQInteger nargs, SQInteger newb
 bool SQVM::TailCall(SQClosure *closure, SQInteger parambase, SQInteger nparams) {
 	SQInteger last_top = _top;
 	SQObjectPtr clo = closure;
-	if (ci->_root) {
+	if (ci->_root != 0u) {
 		Raise_Error("root calls cannot invoke tailcalls");
 		return false;
 	}
@@ -2053,9 +2053,9 @@ void SQVM::LeaveFrame() {
 	ci->_closure.Null();
 	_stackbase -= ci->_prevstkbase;
 	_top = _stackbase + ci->_prevtop;
-	ci = (css) ? &_callsstack[css - 1] : nullptr;
+	ci = ((css) != 0) ? &_callsstack[css - 1] : nullptr;
 
-	if (_openouters) {
+	if (_openouters != nullptr) {
 		CloseOuters(&(_stack._vals[last_stackbase]));
 	}
 	while (last_top >= _top) {
@@ -2065,7 +2065,7 @@ void SQVM::LeaveFrame() {
 
 void SQVM::RelocateOuters() {
 	SQOuter *p = _openouters;
-	while (p) {
+	while (p != nullptr) {
 		p->_valptr = _stack._vals + p->_idx;
 		p = p->_next;
 	}

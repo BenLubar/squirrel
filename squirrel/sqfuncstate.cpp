@@ -393,7 +393,7 @@ SQInteger SQFuncState::GetOuterVariable(const SQObject &name) {
 		}
 	}
 	SQInteger pos = -1;
-	if (_parent) {
+	if (_parent != nullptr) {
 		pos = _parent->GetLocalVariable(name);
 		if (pos == -1) {
 			pos = _parent->GetOuterVariable(name);
@@ -472,7 +472,7 @@ void SQFuncState::AddInstruction(SQInstruction &i) {
 				}
 				break;
 			case _OP_RETURN:
-				if (_parent && i._arg0 != MAX_FUNC_STACKSIZE && pi.op == _OP_CALL && _returnexp < size - 1) {
+				if ((_parent != nullptr) && i._arg0 != MAX_FUNC_STACKSIZE && pi.op == _OP_CALL && _returnexp < size - 1) {
 					pi.op = _OP_TAILCALL;
 				} else if (pi.op == _OP_CLOSE) {
 					pi = i;
@@ -642,7 +642,7 @@ SQFunctionProto *SQFuncState::BuildProto() {
 
 	memcpy(f->_instructions, &_instructions[0], _instructions.size() * sizeof(SQInstruction));
 
-	f->_varparams = _varparams;
+	f->_varparams = static_cast<SQInteger>(_varparams);
 
 	return f;
 }

@@ -112,7 +112,7 @@ static SQInteger _system_date(HSQUIRRELVM v) {
 	} else {
 		date = localtime(&t);
 	}
-	if (!date) {
+	if (date == nullptr) {
 		return sq_throwerror(v, _SC("crt api failure"));
 	}
 	sq_newtable(v);

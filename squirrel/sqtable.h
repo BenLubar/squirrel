@@ -82,7 +82,7 @@ public:
 			if (_rawval(n->key) == _rawval(key) && sq_type(n->key) == sq_type(key)) {
 				return n;
 			}
-		} while ((n = n->next));
+		} while ((n = n->next) != nullptr);
 		return nullptr;
 	}
 	//for compiler use
@@ -95,8 +95,8 @@ public:
 				res = n;
 				break;
 			}
-		} while ((n = n->next));
-		if (res) {
+		} while ((n = n->next) != nullptr);
+		if (res != nullptr) {
 			val = _realval(res->val);
 			return true;
 		}

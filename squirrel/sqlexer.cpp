@@ -435,11 +435,11 @@ SQInteger SQLexer::AddUTF8(SQUnsignedInteger ch) {
 
 SQInteger SQLexer::ProcessStringHexEscape(SQChar *dest, SQInteger maxdigits) {
 	NEXT();
-	if (!isxdigit(CUR_CHAR)) {
+	if (isxdigit(CUR_CHAR) == 0) {
 		Error(_SC("hexadecimal number expected"));
 	}
 	SQInteger n = 0;
-	while (isxdigit(CUR_CHAR) && n < maxdigits) {
+	while ((isxdigit(CUR_CHAR) != 0) && n < maxdigits) {
 		dest[n] = CUR_CHAR;
 		n++;
 		NEXT();
@@ -599,13 +599,13 @@ void LexInteger(const SQChar *s, SQUnsignedInteger *res) {
 }
 
 SQInteger scisodigit(SQInteger c) {
-	return c >= _SC('0') && c <= _SC('7');
+	return static_cast<SQInteger>(c >= _SC('0') && c <= _SC('7'));
 }
 
 void LexOctal(const SQChar *s, SQUnsignedInteger *res) {
 	*res = 0;
 	while (*s != 0) {
-		if (scisodigit(*s)) {
+		if (scisodigit(*s) != 0) {
 			*res = (*res) * 8 + ((*s++) - '0');
 		} else {
 			assert(0);
@@ -614,7 +614,7 @@ void LexOctal(const SQChar *s, SQUnsignedInteger *res) {
 }
 
 SQInteger isexponent(SQInteger c) {
-	return c == 'e' || c == 'E';
+	return static_cast<SQInteger>(c == 'e' || c == 'E');
 }
 
 #define MAX_HEX_DIGITS (sizeof(SQInteger) * 2)
@@ -629,10 +629,10 @@ SQInteger SQLexer::ReadNumber() {
 	SQChar *sTemp;
 	INIT_TEMP_STRING();
 	NEXT();
-	if (firstchar == _SC('0') && (toupper(CUR_CHAR) == _SC('X') || scisodigit(CUR_CHAR))) {
-		if (scisodigit(CUR_CHAR)) {
+	if (firstchar == _SC('0') && (toupper(CUR_CHAR) == _SC('X') || (scisodigit(CUR_CHAR) != 0))) {
+		if (scisodigit(CUR_CHAR) != 0) {
 			type = TOCTAL;
-			while (scisodigit(CUR_CHAR)) {
+			while (scisodigit(CUR_CHAR) != 0) {
 				APPEND_CHAR(CUR_CHAR);
 				NEXT();
 			}
@@ -642,7 +642,7 @@ SQInteger SQLexer::ReadNumber() {
 		} else {
 			NEXT();
 			type = THEX;
-			while (isxdigit(CUR_CHAR)) {
+			while (isxdigit(CUR_CHAR) != 0) {
 				APPEND_CHAR(CUR_CHAR);
 				NEXT();
 			}
@@ -652,11 +652,11 @@ SQInteger SQLexer::ReadNumber() {
 		}
 	} else {
 		APPEND_CHAR((int)firstchar);
-		while (CUR_CHAR == _SC('.') || scisdigit(CUR_CHAR) || isexponent(CUR_CHAR)) {
-			if (CUR_CHAR == _SC('.') || isexponent(CUR_CHAR)) {
+		while (CUR_CHAR == _SC('.') || scisdigit(CUR_CHAR) || (isexponent(CUR_CHAR) != 0)) {
+			if (CUR_CHAR == _SC('.') || (isexponent(CUR_CHAR) != 0)) {
 				type = TFLOAT;
 			}
-			if (isexponent(CUR_CHAR)) {
+			if (isexponent(CUR_CHAR) != 0) {
 				if (type != TFLOAT) {
 					Error(_SC("invalid numeric format"));
 				}

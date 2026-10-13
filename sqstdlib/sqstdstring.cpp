@@ -33,7 +33,7 @@ static SQInteger validate_format(HSQUIRRELVM v, SQChar *fmt, const SQChar *src, 
 	SQInteger wc = 0;
 	SQInteger start = n;
 	fmt[0] = '%';
-	while (isfmtchr(src[n])) {
+	while (isfmtchr(src[n]) != 0u) {
 		n++;
 	}
 	while (scisdigit(src[n])) {
@@ -210,7 +210,7 @@ static SQInteger _string_printf(HSQUIRRELVM v) {
 	}
 
 	SQPRINTFUNCTION printfunc = sq_getprintfunc(v);
-	if (printfunc) {
+	if (printfunc != nullptr) {
 		printfunc(v, _SC("%s"), dest);
 	}
 
@@ -298,7 +298,7 @@ static SQInteger _string_split(HSQUIRRELVM v) {
 		SQChar cur = *end;
 		for (SQInteger i = 0; i < sepsize; i++) {
 			if (cur == seps[i]) {
-				if (!skipempty || (end != start)) {
+				if ((skipempty == 0u) || (end != start)) {
 					sq_pushstring(v, start, end - start);
 					sq_arrayappend(v, -2);
 				}
@@ -382,7 +382,7 @@ static SQInteger _string_escape(HSQUIRRELVM v) {
 					escch = '0';
 					break;
 			}
-			if (escch) {
+			if (escch != 0) {
 				*dest++ = '\\';
 				*dest++ = escch;
 				escaped++;
@@ -395,7 +395,7 @@ static SQInteger _string_escape(HSQUIRRELVM v) {
 		}
 	}
 
-	if (escaped) {
+	if (escaped != 0) {
 		sq_pushstring(v, resstr, dest - resstr);
 	} else {
 		sq_push(v, 2); //nothing escaped
@@ -530,7 +530,7 @@ static SQInteger _regexp_constructor(HSQUIRRELVM v) {
 	const SQChar *pattern;
 	sq_getstring(v, 2, &pattern);
 	SQRex *rex = sqstd_rex_compile(pattern, &error);
-	if (!rex) {
+	if (rex == nullptr) {
 		return sq_throwerror(v, error);
 	}
 	sq_setinstanceup(v, 1, rex);

@@ -96,7 +96,7 @@ SQUnsignedInteger TranslateIndex(const SQObjectPtr &idx) {
 }
 
 SQWeakRef *SQRefCounted::GetWeakRef(SQObjectType type) {
-	if (!_weakref) {
+	if (_weakref == nullptr) {
 		sq_new(_weakref, SQWeakRef);
 #if defined(SQUSEDOUBLE) && !defined(_SQ64) || defined(_SQ64ON32)
 		_weakref->_obj._unVal.raw = 0; //clean the whole union on 32 bits with double
@@ -108,7 +108,7 @@ SQWeakRef *SQRefCounted::GetWeakRef(SQObjectType type) {
 }
 
 SQRefCounted::~SQRefCounted() {
-	if (_weakref) {
+	if (_weakref != nullptr) {
 		_weakref->_obj._type = OT_NULL;
 		_weakref->_obj._unVal.pRefCounted = nullptr;
 	}
@@ -122,7 +122,7 @@ void SQWeakRef::Release() {
 }
 
 bool SQDelegable::GetMetaMethod(SQVM *v, SQMetaMethod mm, SQObjectPtr &res) {
-	if (_delegate) {
+	if (_delegate != nullptr) {
 		return _delegate->Get((*_ss(v)->_metamethods)[mm], res);
 	}
 	return false;
@@ -133,13 +133,13 @@ bool SQDelegable::SetDelegate(SQTable *mt) {
 	if (temp == this) {
 		return false;
 	}
-	while (temp) {
+	while (temp != nullptr) {
 		if (temp->_delegate == this) {
 			return false; //cycle detected
 		}
 		temp = temp->_delegate;
 	}
-	if (mt) {
+	if (mt != nullptr) {
 		__ObjAddRef(mt);
 	}
 	__ObjRelease(_delegate);
@@ -233,7 +233,7 @@ bool SQGenerator::Resume(SQVM *v, SQObjectPtr &dest) {
 
 void SQArray::Extend(const SQArray *a) {
 	SQInteger xlen;
-	if ((xlen = a->Size())) {
+	if ((xlen = a->Size()) != 0) {
 		for (SQInteger i = 0; i < xlen; i++) {
 			Append(a->_values[i]);
 		}
@@ -309,7 +309,7 @@ bool SafeWrite(HSQUIRRELVM v, SQWRITEFUNC write, SQUserPointer up, SQUserPointer
 }
 
 bool SafeRead(HSQUIRRELVM v, SQREADFUNC read, SQUserPointer up, SQUserPointer dest, SQInteger size) {
-	if (size && read(up, dest, size) != size) {
+	if ((size != 0) && read(up, dest, size) != size) {
 		v->Raise_Error(_SC("io error, read function failure, the origin stream could be corrupted/trucated"));
 		return false;
 	}
@@ -619,7 +619,7 @@ void SQArray::Mark(SQCollectable **chain) {
 }
 void SQTable::Mark(SQCollectable **chain) {
 	START_MARK()
-	if (_delegate) {
+	if (_delegate != nullptr) {
 		_delegate->Mark(chain);
 	}
 	SQInteger len = _numofnodes;
@@ -633,7 +633,7 @@ void SQTable::Mark(SQCollectable **chain) {
 void SQClass::Mark(SQCollectable **chain) {
 	START_MARK()
 	_members->Mark(chain);
-	if (_base) {
+	if (_base != nullptr) {
 		_base->Mark(chain);
 	}
 	SQSharedState::MarkObject(_attributes, chain);
@@ -683,7 +683,7 @@ void SQFunctionProto::Mark(SQCollectable **chain) {
 
 void SQClosure::Mark(SQCollectable **chain) {
 	START_MARK()
-	if (_base) {
+	if (_base != nullptr) {
 		_base->Mark(chain);
 	}
 	SQFunctionProto *fp = _function;
@@ -716,7 +716,7 @@ void SQOuter::Mark(SQCollectable **chain) {
 
 void SQUserData::Mark(SQCollectable **chain) {
 	START_MARK()
-	if (_delegate) {
+	if (_delegate != nullptr) {
 		_delegate->Mark(chain);
 	}
 	END_MARK()

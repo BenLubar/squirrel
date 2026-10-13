@@ -16,7 +16,7 @@ SQClass::SQClass(SQSharedState *ss, SQClass *base) {
 	_udsize = 0;
 	_locked = false;
 	_constructoridx = -1;
-	if (_base) {
+	if (_base != nullptr) {
 		_constructoridx = _base->_constructoridx;
 		_udsize = _base->_udsize;
 		_defaultvalues.copy(base->_defaultvalues);
@@ -24,7 +24,7 @@ SQClass::SQClass(SQSharedState *ss, SQClass *base) {
 		_COPY_VECTOR(_metamethods, base->_metamethods, MT_LAST);
 		__ObjAddRef(_base);
 	}
-	_members = base ? base->_members->Clone() : SQTable::Create(ss, 0);
+	_members = (base != nullptr) ? base->_members->Clone() : SQTable::Create(ss, 0);
 	__ObjAddRef(_members);
 
 	INIT_CHAIN();
@@ -37,7 +37,7 @@ void SQClass::Finalize() {
 	_methods.resize(0);
 	_NULL_SQOBJECT_VECTOR(_metamethods, MT_LAST);
 	__ObjRelease(_members);
-	if (_base) {
+	if (_base != nullptr) {
 		__ObjRelease(_base);
 	}
 }
@@ -68,7 +68,7 @@ bool SQClass::NewSlot(SQSharedState *ss, const SQObjectPtr &key, const SQObjectP
 			_metamethods[mmidx] = val;
 		} else {
 			SQObjectPtr theval = val;
-			if (_base && sq_type(val) == OT_CLOSURE) {
+			if ((_base != nullptr) && sq_type(val) == OT_CLOSURE) {
 				theval = _closure(val)->Clone();
 				_closure(theval)->_base = _base;
 				__ObjAddRef(_base); //ref for the closure
@@ -177,7 +177,7 @@ void SQInstance::Finalize() {
 
 SQInstance::~SQInstance() {
 	REMOVE_FROM_CHAIN(&_sharedstate->_gc_chain, this);
-	if (_class) {
+	if (_class != nullptr) {
 		Finalize();
 	} //if _class is null it was already finalized by the GC
 }

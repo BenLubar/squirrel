@@ -211,7 +211,7 @@ SQInteger _stream_len(HSQUIRRELVM v) {
 
 SQInteger _stream_flush(HSQUIRRELVM v) {
 	SETUP_STREAM(v);
-	if (!self->Flush()) {
+	if (self->Flush() == 0) {
 		sq_pushinteger(v, 1);
 	} else {
 		sq_pushnull(v);

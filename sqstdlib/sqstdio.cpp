@@ -73,14 +73,14 @@ struct SQFile : public SQStream {
 	virtual ~SQFile() { Close(); }
 	bool Open(const SQChar *filename, const SQChar *mode) {
 		Close();
-		if ((_handle = sqstd_fopen(filename, mode))) {
+		if ((_handle = sqstd_fopen(filename, mode)) != nullptr) {
 			_owns = true;
 			return true;
 		}
 		return false;
 	}
 	void Close() {
-		if (_handle && _owns) {
+		if ((_handle != nullptr) && _owns) {
 			sqstd_fclose(_handle);
 			_handle = nullptr;
 			_owns = false;
@@ -108,7 +108,7 @@ struct SQFile : public SQStream {
 	SQInteger Seek(SQInteger offset, SQInteger origin) {
 		return sqstd_fseek(_handle, offset, origin);
 	}
-	bool IsValid() { return _handle ? true : false; }
+	bool IsValid() { return (_handle != nullptr) ? true : false; }
 	bool EOS() { return Tell() == Len() ? true : false; }
 	SQFILE GetHandle() { return _handle; }
 
@@ -139,7 +139,7 @@ static SQInteger _file_constructor(HSQUIRRELVM v) {
 		sq_getstring(v, 2, &filename);
 		sq_getstring(v, 3, &mode);
 		newf = sqstd_fopen(filename, mode);
-		if (!newf) {
+		if (newf == nullptr) {
 			return sq_throwerror(v, _SC("cannot open file"));
 		}
 	} else if (sq_gettype(v, 2) == OT_USERPOINTER) {
@@ -184,7 +184,7 @@ SQRESULT sqstd_createfile(HSQUIRRELVM v, SQFILE file, SQBool own) {
 		sq_remove(v, -2); //removes the registry
 		sq_pushroottable(v); // push the this
 		sq_pushuserpointer(v, file); //file
-		if (own) {
+		if (own != 0u) {
 			sq_pushinteger(v, 1); //true
 		} else {
 			sq_pushnull(v); //false
@@ -335,7 +335,7 @@ SQRESULT sqstd_loadfile(HSQUIRRELVM v, const SQChar *filename, SQBool printerror
 	unsigned short us;
 	unsigned char uc;
 	SQLEXREADFUNC func = _io_file_lexfeed_PLAIN;
-	if (file) {
+	if (file != nullptr) {
 		ret = sqstd_fread(&us, 1, 2, file);
 		if (ret != 2) {
 			//probably an empty file
@@ -400,7 +400,7 @@ SQRESULT sqstd_dofile(HSQUIRRELVM v, const SQChar *filename, SQBool retval, SQBo
 	if (SQ_SUCCEEDED(sqstd_loadfile(v, filename, printerror))) {
 		sq_push(v, -2);
 		if (SQ_SUCCEEDED(sq_call(v, 1, retval, SQTrue))) {
-			sq_remove(v, retval ? -2 : -1); //removes the closure
+			sq_remove(v, (retval != 0u) ? -2 : -1); //removes the closure
 			return 1;
 		}
 		sq_pop(v, 1); //removes the closure
@@ -410,7 +410,7 @@ SQRESULT sqstd_dofile(HSQUIRRELVM v, const SQChar *filename, SQBool retval, SQBo
 
 SQRESULT sqstd_writeclosuretofile(HSQUIRRELVM v, const SQChar *filename) {
 	SQFILE file = sqstd_fopen(filename, _SC("wb+"));
-	if (!file) {
+	if (file == nullptr) {
 		return sq_throwerror(v, _SC("cannot open the file"));
 	}
 	if (SQ_SUCCEEDED(sq_writeclosure(v, file_write, file))) {

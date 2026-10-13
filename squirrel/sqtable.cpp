@@ -22,15 +22,15 @@ SQTable::SQTable(SQSharedState *ss, SQInteger nInitialSize) {
 
 void SQTable::Remove(const SQObjectPtr &key) {
 	_HashNode *n = _Get(key, HashObj(key) & (_numofnodes - 1));
-	if (n) {
+	if (n != nullptr) {
 		n->val.Null();
 		n->key.Null();
 #ifdef KEEP_SLOT_ORDER
-		if (n->nextinorder) {
+		if (n->nextinorder != nullptr) {
 			assert(n->nextinorder->previnorder == n);
 			n->nextinorder->previnorder = n->previnorder;
 		}
-		if (n->previnorder) {
+		if (n->previnorder != nullptr) {
 			assert(n->previnorder->nextinorder == n);
 			n->previnorder->nextinorder = n->nextinorder;
 		}
@@ -90,7 +90,7 @@ void SQTable::Rehash(bool force) {
 	}
 	_usednodes = 0;
 #ifdef KEEP_SLOT_ORDER
-	while (oldn) {
+	while (oldn != nullptr) {
 		assert(sq_type(oldn->key) != OT_NULL);
 		NewSlot(oldn->key, oldn->val);
 		oldn = oldn->nextinorder;
@@ -169,7 +169,7 @@ bool SQTable::Get(const SQObjectPtr &key, SQObjectPtr &val) {
 		return false;
 	}
 	_HashNode *n = _Get(key, HashObj(key) & (_numofnodes - 1));
-	if (n) {
+	if (n != nullptr) {
 		val = _realval(n->val);
 		return true;
 	}
@@ -179,7 +179,7 @@ bool SQTable::NewSlot(const SQObjectPtr &key, const SQObjectPtr &val) {
 	assert(sq_type(key) != OT_NULL);
 	SQHash h = HashObj(key) & (_numofnodes - 1);
 	_HashNode *n = _Get(key, h);
-	if (n) {
+	if (n != nullptr) {
 		n->val = val;
 		return false;
 	}
@@ -209,11 +209,11 @@ bool SQTable::NewSlot(const SQObjectPtr &key, const SQObjectPtr &val) {
 			n->nextinorder = mp->nextinorder;
 			assert(!n->previnorder);
 			n->previnorder = mp->previnorder;
-			if (n->nextinorder) {
+			if (n->nextinorder != nullptr) {
 				assert(n->nextinorder->previnorder == mp);
 				n->nextinorder->previnorder = n;
 			}
-			if (n->previnorder) {
+			if (n->previnorder != nullptr) {
 				assert(n->previnorder->nextinorder == mp);
 				n->previnorder->nextinorder = n;
 			}
@@ -238,7 +238,7 @@ bool SQTable::NewSlot(const SQObjectPtr &key, const SQObjectPtr &val) {
 	}
 	mp->key = key;
 #ifdef KEEP_SLOT_ORDER
-	if (_lastinorder) {
+	if (_lastinorder != nullptr) {
 		mp->previnorder = _lastinorder;
 		assert(!_lastinorder->nextinorder);
 		_lastinorder->nextinorder = mp;
@@ -267,14 +267,14 @@ bool SQTable::NewSlot(const SQObjectPtr &key, const SQObjectPtr &val) {
 SQInteger SQTable::Next(bool getweakrefs, const SQObjectPtr &refpos, SQObjectPtr &outkey, SQObjectPtr &outval) {
 	SQInteger idx = (SQInteger)TranslateIndex(refpos);
 #ifdef KEEP_SLOT_ORDER
-	if (idx == 0 && _firstinorder) {
+	if (idx == 0 && (_firstinorder != nullptr)) {
 		outkey = _firstinorder->key;
 		outval = getweakrefs ? (SQObject)_firstinorder->val : _realval(_firstinorder->val);
 		return 1 + (_firstinorder - _nodes);
 	}
 	if (idx > 0 && idx <= _numofnodes) {
 		_HashNode *n = _nodes[idx - 1].nextinorder;
-		if (n) {
+		if (n != nullptr) {
 			outkey = n->key;
 			outval = getweakrefs ? (SQObject)n->val : _realval(n->val);
 			return 1 + (n - _nodes);
@@ -299,7 +299,7 @@ SQInteger SQTable::Next(bool getweakrefs, const SQObjectPtr &refpos, SQObjectPtr
 
 bool SQTable::Set(const SQObjectPtr &key, const SQObjectPtr &val) {
 	_HashNode *n = _Get(key, HashObj(key) & (_numofnodes - 1));
-	if (n) {
+	if (n != nullptr) {
 		n->val = val;
 		return true;
 	}

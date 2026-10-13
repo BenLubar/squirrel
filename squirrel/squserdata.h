@@ -31,7 +31,7 @@ struct SQUserData : SQDelegable {
 	SQObjectType GetType() { return OT_USERDATA; }
 #endif
 	void Release() {
-		if (_hook) {
+		if (_hook != nullptr) {
 			_hook((SQUserPointer)sq_aligning(this + 1), _size);
 		}
 		SQInteger tsize = _size;

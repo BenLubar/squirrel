@@ -1278,7 +1278,7 @@ public:
 			} else {
 				break;
 			}
-		} while (1);
+		} while (true);
 	}
 	void IfBlock() {
 		if (_token == _SC('{')) {
@@ -1640,10 +1640,10 @@ public:
 		Lex();
 		_fs->AddInstruction(_OP_PUSHTRAP, 0, 0);
 		_fs->_traps++;
-		if (_fs->_breaktargets.size()) {
+		if (_fs->_breaktargets.size() != 0u) {
 			_fs->_breaktargets.top()++;
 		}
-		if (_fs->_continuetargets.size()) {
+		if (_fs->_continuetargets.size() != 0u) {
 			_fs->_continuetargets.top()++;
 		}
 		SQInteger trappos = _fs->GetCurrentPos();
@@ -1654,10 +1654,10 @@ public:
 		}
 		_fs->_traps--;
 		_fs->AddInstruction(_OP_POPTRAP, 1, 0);
-		if (_fs->_breaktargets.size()) {
+		if (_fs->_breaktargets.size() != 0u) {
 			_fs->_breaktargets.top()--;
 		}
-		if (_fs->_continuetargets.size()) {
+		if (_fs->_continuetargets.size() != 0u) {
 			_fs->_continuetargets.top()--;
 		}
 		_fs->AddInstruction(_OP_JMP, 0, 0);

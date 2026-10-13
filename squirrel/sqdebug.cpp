@@ -104,7 +104,7 @@ void SQVM::Raise_ParamTypeError(SQInteger nparam, SQInteger typemask, SQInteger 
 	SQInteger found = 0;
 	for (SQInteger i = 0; i < 16; i++) {
 		SQInteger mask = ((SQInteger)1) << i;
-		if (typemask & (mask)) {
+		if ((typemask & (mask)) != 0) {
 			if (found > 0) {
 				StringCat(exptypes, SQString::Create(_ss(this), _SC("|"), -1), exptypes);
 			}

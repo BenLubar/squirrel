@@ -64,12 +64,12 @@ public:
 	bool GetAttributes(const SQObjectPtr &key, SQObjectPtr &outval);
 	void Lock() {
 		_locked = true;
-		if (_base) {
+		if (_base != nullptr) {
 			_base->Lock();
 		}
 	}
 	void Release() {
-		if (_hook) {
+		if (_hook != nullptr) {
 			_hook(_typetag, 0);
 		}
 		sq_delete(this, SQClass);
@@ -107,7 +107,7 @@ public:
 		SQInteger size = calcinstancesize(theclass);
 		SQInstance *newinst = (SQInstance *)SQ_MALLOC(size);
 		new (newinst) SQInstance(ss, theclass, size);
-		if (theclass->_udsize) {
+		if (theclass->_udsize != 0) {
 			newinst->_userpointer = ((unsigned char *)newinst) + (size - theclass->_udsize);
 		}
 		return newinst;
@@ -116,7 +116,7 @@ public:
 		SQInteger size = calcinstancesize(_class);
 		SQInstance *newinst = (SQInstance *)SQ_MALLOC(size);
 		new (newinst) SQInstance(ss, this, size);
-		if (_class->_udsize) {
+		if (_class->_udsize != 0) {
 			newinst->_userpointer = ((unsigned char *)newinst) + (size - _class->_udsize);
 		}
 		return newinst;
@@ -144,7 +144,7 @@ public:
 	}
 	void Release() {
 		_uiRef++;
-		if (_hook) {
+		if (_hook != nullptr) {
 			_hook(_userpointer, 0);
 		}
 		_uiRef--;
