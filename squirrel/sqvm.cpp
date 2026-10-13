@@ -442,6 +442,7 @@ bool SQVM::ToString(const SQObjectPtr &o, SQObjectPtr &res) {
 					}
 				}
 			}
+			[[fallthrough]];
 		default:
 #ifdef NO_POINTER_CMP
 			scsprintf(_sp(sq_rsl((sizeof(void *) * 2))), sq_rsl((sizeof(void *) * 2)), _SC("(%s)"), GetTypeName(o));
@@ -942,6 +943,7 @@ exception_restore:
 						_top = std::max(last_top, _top);
 						continue;
 					}
+					[[fallthrough]];
 				}
 				case _OP_CALL: {
 					SQInteger is_delegate = 0;
@@ -1757,7 +1759,7 @@ SQInteger SQVM::FallBackSet(const SQObjectPtr &self, const SQObjectPtr &key, con
 					return FALLBACK_OK;
 				}
 			}
-			//keps on going
+			[[fallthrough]]; //keps on going
 		case OT_INSTANCE:
 		case OT_USERDATA: {
 			SQObjectPtr closure;

@@ -100,7 +100,7 @@ public:
 		SQCompiler *c = static_cast<SQCompiler *>(ud);
 		c->Error(s);
 	}
-	void Error(const SQChar *s, ...) {
+	[[noreturn]] void Error(const SQChar *s, ...) {
 		va_list vl;
 		va_start(vl, s);
 		scvsprintf(_compilererror, MAX_COMPILER_ERROR_LEN, s, vl);

@@ -98,6 +98,7 @@ void SQLexer::Init(SQSharedState *ss, SQLEXREADFUNC rg, SQUserPointer up, Compil
 
 void SQLexer::Error(const SQChar *err) {
 	_errfunc(_errtarget, err);
+	std::abort(); // _errfunc should have called longjmp
 }
 
 void SQLexer::Next() {
