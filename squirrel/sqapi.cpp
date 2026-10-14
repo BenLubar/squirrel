@@ -1140,6 +1140,7 @@ void sq_pushobject(HSQUIRRELVM v, HSQOBJECT obj) {
 }
 
 void sq_resetobject(HSQOBJECT *po) {
+	po->_unVal.raw = 0;
 	po->_unVal.pUserPointer = nullptr;
 	po->_type = OT_NULL;
 }
